@@ -3,24 +3,24 @@ package src;
 import java.util.HashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-public class Utilizadores {
-    private final HashMap<String, String> utilizadores;  //key:username(email)/value:password
+public class Users {
+    private final HashMap<String, String> users;  //key:username(email)/value:password
     public ReentrantReadWriteLock l = new ReentrantReadWriteLock();
 
-    public Utilizadores() {
-        this.utilizadores = new HashMap<>();
+    public Users() {
+        this.users = new HashMap<>();
     }
 
-    public boolean utilizadorExiste(String email) {
-        return utilizadores.containsKey(email);
+    public boolean hasUser(String email) {
+        return users.containsKey(email);
     }
 
     public String getPassword(String email) {
-        return utilizadores.get(email);
+        return users.get(email);
     }
 
-    public void addUtilizador(String email, String password) {
-        utilizadores.put(email, password);
+    public void addUser(String email, String password) {
+        users.put(email, password);
     }
 
     /* Nem vou por os imports porque ainda não sei se vamos usar assim :)
@@ -36,7 +36,7 @@ public class Utilizadores {
     public static Accounts deserialize(String filepath) throws IOException, ClassNotFoundException {
         FileInputStream fis = new FileInputStream(filepath);
         ObjectInputStream ois = new ObjectInputStream(fis);
-        Utilizadores utilizadores = (Utilizadores) ois.readObject();
+        users users = (users) ois.readObject();
         ois.close();
         fis.close();
         return accounts;
