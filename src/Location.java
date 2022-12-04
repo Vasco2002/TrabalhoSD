@@ -5,21 +5,24 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 public class Location {
     public int x;
     public int y;
+    public int freeScooters; //number of free scooters at this location
     public ReentrantReadWriteLock l = new ReentrantReadWriteLock();
 
     public Location(int x, int y) 
     {
         this.x = x;
         this.y = y;
+        this.freeScooters = 0;
     }
 
     public Location(Location pos) 
     {
         this.x = pos.x;
         this.y = pos.y;
+        this.freeScooters = pos.freeScooters;
     }
 
-    public int distancia(Location l) 
+    public int distance(Location l)
     {
         return Math.abs(l.x - this.x) + Math.abs(l.y - this.y);
     }
@@ -38,4 +41,28 @@ public class Location {
     }
 
     public Location clone() { return new Location(this); }
+
+    public int getFreeScooters()
+    {
+        try {
+            l.readLock().lock();
+            return freeScooters;
+        }
+        finally {l.readLock().unlock();}
+    }
+
+    public void addScotter()
+    {
+        l.writeLock().lock();
+        this.freeScooters++;
+        l.writeLock().unlock();
+    }
+
+    public void removeScotter()
+    {
+        l.writeLock().lock();
+        this.freeScooters--;
+        l.writeLock().unlock();
+    }
+
 }

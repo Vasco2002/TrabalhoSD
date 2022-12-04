@@ -3,6 +3,7 @@ package src;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.List;
 
 class ServerWorker implements Runnable 
 {
@@ -40,7 +41,7 @@ class ServerWorker implements Runnable
         {
             DataInputStream in = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
             DataOutputStream out = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
-            Connection c = new Connection(this.socket);
+            TaggedConnection c = new TaggedConnection(this.socket);
 
             while (true) 
             {
@@ -64,11 +65,11 @@ class ServerWorker implements Runnable
                             if (stored_password.equals(password)) 
                             {
                                 // passwords match
-                                c.send(0, "", "Session started successfully!".getBytes());
+                                c.send(0, "", 0,0,0,"Session started successfully!".getBytes());
                             }
-                            else c.send(0, "", "Error - Wrong Password.".getBytes());
+                            else c.send(0, "",0,0,0, "Error - Wrong Password.".getBytes());
                         } else
-                            c.send(0, "", "Error - Account doesn't exist.".getBytes());
+                            c.send(0, "",0,0,0, "Error - Account doesn't exist.".getBytes());
                         break;
                     case 1:
                         // User registration
@@ -77,29 +78,35 @@ class ServerWorker implements Runnable
                         users.l.writeLock().lock();
                         try {
                             if(users.hasUser(email))
-                                c.send(1, "", "Erro - endereço de email já pertence a uma conta.".getBytes());
+                                c.send(1, "",0,0,0, "Error - Username already exists".getBytes());
                             else {
                                 users.addUser(email, password);
-                                c.send(frame.tag, "", "Registo efetuado com sucesso!".getBytes());
+                                c.send(frame.tag, "",0,0,0, "Username added successfully!".getBytes());
                             }
                         } finally {
                             users.l.writeLock().unlock();
                         }
                         break;
                     case 2:
-                        // listar locais com trotinetes perto
+                        // List locations with close free scooters
+                        Location pos = new Location(frame.x, frame.y);
+                        List<Location> result = map.locationsFreeScooters(frame.r, pos);
+                        c.send(2,"",0,0,0,result.toString().getBytes());
                         break;
                     case 3:
-                        // listar recompensas
+                        // List rewards
+                        pos = new Location(frame.x, frame.y);
+                        map.makeReservation(frame.username, pos);
+                        c.send(3,"",0,0,0,"Reservation done successfully!".getBytes());
                         break;
                     case 4:
-                        // reversar
+                        // Reservation
                         break;
                     case 5:
-                        // estacionamento
+                        // Parking
                         break;
                     case 6:
-                        // há recompensas perto
+                        // There are close rewards
                         break;
                 
                 }   

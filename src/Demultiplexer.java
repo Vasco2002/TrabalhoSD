@@ -1,18 +1,15 @@
 package src;
 
 import java.io.IOException;
-import java.util.ArrayDeque;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class Demultiplexer {
 
-    private final Connection c;
-    private final ReentrantLock l = new ReentrantLock();
-    private final Map<Integer, FrameValue> map = new HashMap<>();
+    private TaggedConnection tc;
+    private ReentrantLock l = new ReentrantLock();
+    private HashMap<Integer, FrameValue> map = new HashMap<>();
     private IOException exception = null;
 
     private class FrameValue {
@@ -25,15 +22,15 @@ public class Demultiplexer {
         }
     }
 
-    public Demultiplexer(Connection conn) {
-        this.c = conn;
+    public Demultiplexer(TaggedConnection conn) throws IOException {
+        this.tc = conn;
     }
 
     public void start() {
         new Thread(() -> {
             try {
                 while (true) {
-                    Frame frame = c.receive();
+                    Frame frame = tc.receive();
                     l.lock();
                     try {
                         FrameValue fv = map.get(frame.tag);
@@ -56,11 +53,11 @@ public class Demultiplexer {
     }
 
     public void send(Frame frame) throws IOException {
-        c.send(frame);
+        tc.send(frame);
     }
 
-    public void send(int tag, String username, byte[] data) throws IOException {
-        c.send(tag, username, data);
+    public void send(int tag, String username, int x, int y, int r, byte[] data) throws IOException {
+        tc.send(tag, username, x, y, r, data);
     }
 
     public byte[] receive(int tag) throws IOException, InterruptedException {
@@ -94,6 +91,6 @@ public class Demultiplexer {
 
 
     public void close() throws IOException {
-        c.close();
+        tc.close();
     }
 }

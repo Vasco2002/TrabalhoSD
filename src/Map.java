@@ -5,16 +5,16 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class Map {
 
     private int n; // Number of lines/columns of the map
     private Location[][] map;
-    private HashMap<String, Location> usersLocation;
-    private HashMap<Location, Integer> freeScooters; // value is the number of dree scooters in the given location
     private Integer reservationCode = 0; // counter of the reservation
     private Queue<Reservation> reservation; // queue with the reservation
-    private HashMap<String, Boolean> clientReservation; // each customer can only make one reservation at the same time
+    private List<String> clientReservation; // each customer can only make one reservation at the same time
+    private ReentrantLock reservationL = new ReentrantLock();
 
 
     public Map(Integer n) 
@@ -29,63 +29,47 @@ public class Map {
                 this.map[i][j] = novoLocal;
             }
         }
-        this.usersLocation = new HashMap<>();
-        this.freeScooters = new HashMap<>();
         this.reservation = new LinkedList<>();
-        this.clientReservation = new HashMap<>();
+        this.clientReservation = new ArrayList<>();
     }
 
     // public void movimentoUtilizador(String username, Local proximo) {
     //     this.utilizadoresLocal.put(username, proximo);
     // }
 
-    public void rmakeReservation(String username, Location l) 
+    public void makeReservation(String username, Location l)
     {
-        if (this.clientReservation.containsKey(username)) 
-        {
-            if (!this.clientReservation.get(username) && (this.freeScooters.get(l)) > 0) { // the location needs to heve free scooters
-                Reservation reserv = new Reservation(this.reservationCode, username, l);
-                this.reservation.add(reserv);
-                this.clientReservation.put(username, true);
-                this.reservationCode++;
-                int n_scooters = this.freeScooters.get(l);
-                this.freeScooters.put(l, n_scooters-1);
-            }
-        }
-        else if (this.freeScooters.get(l) > 0) {
+        if (!this.clientReservation.contains(username) && (l.getFreeScooters() > 0)) { // the location needs to have free scooters
             Reservation reserv = new Reservation(this.reservationCode, username, l);
             this.reservation.add(reserv);
-            this.clientReservation.put(username, true);
+            this.clientReservation.add(username);
             this.reservationCode++;
-            int n_scooters = this.freeScooters.get(l);
-            this.freeScooters.put(l, n_scooters-1);
+            l.removeScotter();
         }
     }
 
-    public Reservation getReservation() {
-        return this.reservation.peek();
-    }
-
-    public boolean hasScooters(Location l) 
+    public Reservation getReservation()
     {
-        if (!this.freeScooters.containsKey(l)) return false;
-        else if (this.freeScooters.get(l) == 0) return false;
-        else return true;
+        try {
+            reservationL.lock();
+            return this.reservation.peek();
+        } finally {reservationL.unlock();}
     }
 
-    // Devolve uma lista com os locais com trotinetes livres 
-    public List<Location> locationsFreeScooters(Integer d, String username) {
+    //Returns a list with all the locations with free scotters, in a distance
+    public List<Location> locationsFreeScooters(Integer d, Location userLocation) {
         List<Location> withFreeScooters = new ArrayList<>();
-        Location userLocation = this.usersLocation.get(username);
 
-        for (Location l : this.freeScooters.keySet()) {
-            if (userLocation.distance(l) > d) {
-                if (this.freeScooters.get(l) > 0) withFreeScooters.add(l);
+        for (int i=0; i<n; i++)
+        {
+            for (int j=0; i<n; j++)
+            {
+                if(map[i][j].distance(userLocation)<=d)
+                    if(map[i][j].getFreeScooters() > 0)
+                        withFreeScooters.add(map[i][j]);
             }
         }
 
         return withFreeScooters;
     }
-
-
 }
