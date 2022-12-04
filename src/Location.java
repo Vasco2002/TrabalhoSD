@@ -1,5 +1,7 @@
 package src;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class Location {
@@ -7,19 +9,22 @@ public class Location {
     public int y;
     public int freeScooters; //number of free scooters at this location
     public ReentrantReadWriteLock l = new ReentrantReadWriteLock();
+    public List<Reward> rewards;
 
     public Location(int x, int y) 
     {
         this.x = x;
         this.y = y;
         this.freeScooters = 0;
+        this.rewards = new ArrayList<>();
     }
 
     public Location(Location pos) 
     {
         this.x = pos.x;
         this.y = pos.y;
-        this.freeScooters = pos.freeScooters;
+        this.freeScooters = pos.getFreeScooters();
+        this.rewards = pos.getRewards();
     }
 
     public int distance(Location l)
@@ -62,6 +67,29 @@ public class Location {
     {
         l.writeLock().lock();
         this.freeScooters--;
+        l.writeLock().unlock();
+    }
+
+    public List<Reward> getRewards()
+    {
+        try {
+            l.readLock().lock();
+            return this.rewards;
+        }
+        finally {l.readLock().unlock();}
+    }
+
+    public void setRewards(List<Reward> lr)
+    {
+        l.writeLock().lock();
+        this.rewards = lr;
+        l.writeLock().unlock();
+    }
+
+    public void addReward(Reward r)
+    {
+        l.writeLock().lock();
+        this.rewards.add(r);
         l.writeLock().unlock();
     }
 

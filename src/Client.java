@@ -39,8 +39,8 @@ public class Client {
                 String email = stdin.readLine();
                 System.out.print("Password: ");
                 String password = stdin.readLine();
-                m.send(0, email, 0, 0, 0, password.getBytes());
-                String response = new String(m.receive(0));
+                m.send(-1, email, 0, 0, 0, password.getBytes());
+                String response = new String(m.receive(-1));
                 if(!response.startsWith("Error")) {
                     username = email;
                 }
@@ -53,8 +53,8 @@ public class Client {
                 String email = stdin.readLine();
                 System.out.print("Password: ");
                 String password = stdin.readLine();
-                m.send(1, email, 0, 0, 0, password.getBytes());
-                String response = new String(m.receive(1));
+                m.send(-2, email, 0, 0, 0, password.getBytes());
+                String response = new String(m.receive(-2));
                 if(!response.startsWith("Error")) {
                     username = email;
                 }
@@ -94,8 +94,8 @@ public class Client {
                     int y = stdin.read();
                     System.out.println("Radius:");
                     int r = stdin.read();
-                    m.send(2, username, x, y, r, null);
-                    String response = new String(m.receive(2));
+                    m.send(1, username, x, y, r, null);
+                    String response = new String(m.receive(1));
                     System.out.println("\n" + response + "\n");
                     break;
                 case 2:
@@ -104,18 +104,27 @@ public class Client {
                     x = stdin.read();
                     System.out.print("\ny: ");
                     y = stdin.read();
-                    m.send(3, username, x, y, 0, null);
-                    response = new String(m.receive(3));
+                    m.send(2, username, x, y, 0, null);
+                    response = new String(m.receive(2));
                     System.out.println("\n" + response + "\n");
                     break;
                 case 3:
-                    // m.send(5,blabla)
+                    // m.send(3,blabla)
                     break;
                 case 4:
-                    // m.send(6,blabla)
+                    System.out.println("Enter your current location:\n"
+                            + "x: ");
+                    x = stdin.read();
+                    System.out.print("\ny: ");
+                    y = stdin.read();
+                    m.send(4, username, x, y, 0, null);
+                    response = new String(m.receive(4));
+                    System.out.println("\n" + response + "\n");
                     break;
                 case 5:
-                    // m.send(3,blabla)
+                    m.send(5, username, 0, 0, 0, null);
+                    response = new String(m.receive(5));
+                    System.out.println("\n" + response + "\n");
                     break;
             }
         }

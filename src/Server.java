@@ -39,8 +39,6 @@ class ServerWorker implements Runnable
         String password;
         try 
         {
-            DataInputStream in = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
-            DataOutputStream out = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
             TaggedConnection c = new TaggedConnection(this.socket);
 
             while (true) 
@@ -48,7 +46,7 @@ class ServerWorker implements Runnable
                 Frame frame = c.receive();
 
                 switch(frame.tag){
-                    case 0:
+                    case -1:
                         //Log in
                         email = frame.username;
                         password = new String(frame.data);
@@ -65,20 +63,20 @@ class ServerWorker implements Runnable
                             if (stored_password.equals(password)) 
                             {
                                 // passwords match
-                                c.send(0, "", 0,0,0,"Session started successfully!".getBytes());
+                                c.send(-1, "", 0,0,0,"Session started successfully!".getBytes());
                             }
-                            else c.send(0, "",0,0,0, "Error - Wrong Password.".getBytes());
+                            else c.send(-1, "",0,0,0, "Error - Wrong Password.".getBytes());
                         } else
-                            c.send(0, "",0,0,0, "Error - Account doesn't exist.".getBytes());
+                            c.send(-1, "",0,0,0, "Error - Account doesn't exist.".getBytes());
                         break;
-                    case 1:
+                    case -2:
                         // User registration
                         email = frame.username;
                         password = new String(frame.data);
                         users.l.writeLock().lock();
                         try {
                             if(users.hasUser(email))
-                                c.send(1, "",0,0,0, "Error - Username already exists".getBytes());
+                                c.send(-2, "",0,0,0, "Error - Username already exists".getBytes());
                             else {
                                 users.addUser(email, password);
                                 c.send(frame.tag, "",0,0,0, "Username added successfully!".getBytes());
@@ -87,27 +85,32 @@ class ServerWorker implements Runnable
                             users.l.writeLock().unlock();
                         }
                         break;
-                    case 2:
+                    case 1:
                         // List locations with close free scooters
                         Location pos = new Location(frame.x, frame.y);
                         List<Location> result = map.locationsFreeScooters(frame.r, pos);
-                        c.send(2,"",0,0,0,result.toString().getBytes());
+                        c.send(1,"",0,0,0,result.toString().getBytes());
                         break;
-                    case 3:
-                        // List rewards
+                    case 2:
+                        // Reservation
                         pos = new Location(frame.x, frame.y);
                         map.makeReservation(frame.username, pos);
-                        c.send(3,"",0,0,0,"Reservation done successfully!".getBytes());
+                        c.send(2,"",0,0,0,"Reservation done successfully!".getBytes());
                         break;
-                    case 4:
-                        // Reservation
-                        break;
-                    case 5:
+                    case 3:
                         // Parking
                         break;
-                    case 6:
+                    case 4:
                         // There are close rewards
+                        pos = new Location(frame.x, frame.y);
+                        c.send(4,"",0,0,0,pos.getRewards().toString().getBytes());
                         break;
+                        
+                    case 5:
+                        // List rewards
+                        c.send(4,"",0,0,0,map.showAllRewards().toString().getBytes());
+                        break;
+                        
                 
                 }   
                 

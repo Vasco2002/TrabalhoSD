@@ -1,7 +1,6 @@
 package src;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -15,6 +14,7 @@ public class Map {
     private Queue<Reservation> reservation; // queue with the reservation
     private List<String> clientReservation; // each customer can only make one reservation at the same time
     private ReentrantLock reservationL = new ReentrantLock();
+    private final int D = 2;
 
 
     public Map(Integer n) 
@@ -32,10 +32,6 @@ public class Map {
         this.reservation = new LinkedList<>();
         this.clientReservation = new ArrayList<>();
     }
-
-    // public void movimentoUtilizador(String username, Local proximo) {
-    //     this.utilizadoresLocal.put(username, proximo);
-    // }
 
     public void makeReservation(String username, Location l)
     {
@@ -72,4 +68,49 @@ public class Map {
 
         return withFreeScooters;
     }
+
+    public void createReward(Location locA)
+    {
+        locA.setRewards(null); //clean list of rewards
+        int i,j;
+
+        if(locA.getFreeScooters()>1)
+        {
+            for (i=0; i<n; i++) 
+            {
+                for (j=0; i<n; j++) 
+                {
+                    Location locB = this.map[i][j];
+
+                    if(this.locationsFreeScooters(D,locB).size()==0)
+                    {
+                        Double priceReward = (locA.getFreeScooters() * 0.6 + locA.distance(locB) * 0.4)/2;
+                        locA.addReward(new Reward(locB, priceReward));
+                    }
+                }
+            }
+        }
+    }
+
+
+    public void createAllRewards()
+    {
+        int i,j;
+        for (i=0; i<n; i++) 
+            for (j=0; i<n; j++) 
+                createReward(map[i][j]);
+    }
+
+
+    public List<Reward> showAllRewards()
+    {
+        List<Reward> result = new ArrayList<>();
+        int i,j;
+        for (i=0; i<n; i++) 
+            for (j=0; i<n; j++) 
+                result.addAll(this.map[i][j].getRewards());
+
+        return result;
+    }
+
 }
