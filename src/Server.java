@@ -87,7 +87,7 @@ class ServerWorker implements Runnable
                         }
                         break;
                     case 2:
-                        // listar locais com trotinetes livres
+                        // listar locais com trotinetes perto
                         break;
                     case 3:
                         // listar recompensas
