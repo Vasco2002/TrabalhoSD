@@ -110,6 +110,14 @@ public class Client {
                     break;
                 case 3:
                     // m.send(3,blabla)
+                    System.out.println("Enter the location which you want to park the scooter:\n"
+                            + "x: ");
+                    x = stdin.read();
+                    System.out.print("\ny: ");
+                    y = stdin.read();
+                    m.send(3, username, x, y, 0, null);
+                    response = new String(m.receive(3));
+                    System.out.println("\n" + response + "\n");
                     break;
                 case 4:
                     System.out.println("Enter your current location:\n"

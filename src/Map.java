@@ -44,6 +44,14 @@ public class Map {
         }
     }
 
+    public void parkScooter(String username, Location l) 
+    {
+        if (this.clientReservation.contains(username)) { 
+            this.clientReservation.remove(username);
+            l.addScotter();
+        }
+    }
+
     public Reservation getReservation()
     {
         try {

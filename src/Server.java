@@ -99,6 +99,9 @@ class ServerWorker implements Runnable
                         break;
                     case 3:
                         // Parking
+                        pos = new Location(frame.x, frame.y);
+                        map.parkScooter(frame.username, pos);
+                        c.send(3,"",0,0,0,"Parking done successfully!".getBytes());
                         break;
                     case 4:
                         // There are close rewards
