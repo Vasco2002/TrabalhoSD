@@ -3,9 +3,13 @@ package src;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 class ServerWorker implements Runnable 
 {
@@ -27,18 +31,33 @@ class ServerWorker implements Runnable
         // Get the users
         f = new File(fileUsers);
         if(!f.exists())
-            users = new HashMap<>();
+            this.parserUser(fileUsers);
         // else users = Users.parse(fileUsers);
         //else users = users.deserialize("users.ser");
 
         this.socket = socket;
 
-        while(true) 
-        {
-            Thread rewards = new Thread(new Rewards(map));
-            rewards.start();
-        }
+        Thread rewards = new Thread(new Rewards(map));
+        rewards.start();
 
+    }
+
+    public List<String> readFile(String nomeFich) {
+        List<String> lines;
+        try { lines = Files.readAllLines(Paths.get(nomeFich), StandardCharsets.UTF_8);}
+        catch(IOException exc) {
+            lines = new ArrayList<>();
+        }
+        return lines;
+    }
+
+    public void parserUser (String fileUsers) {
+        List<String> linhas = readFile(fileUsers);
+        String[] parts;
+        for (String linha : linhas) {
+            parts = linha.split(";\n");
+            this.users.put(parts[0],new User(parts[1]));
+        }
     }
 
     @Override
@@ -120,7 +139,7 @@ class ServerWorker implements Runnable
                         
                     case 5:
                         // List rewards
-                        c.send(4,"",0,0,0,rewards.showAllRewards().toString().getBytes());
+                        c.send(4,"",0,0,0,map.showAllRewards().toString().getBytes());
                         break;
                         
                 

@@ -1,7 +1,9 @@
 package src;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class Map {
@@ -9,7 +11,13 @@ public class Map {
     private int n; // Number of lines/columns of the map
     private Location[][] map;
     private Integer reservationCode = 0; // counter of the reservation
-    public ReentrantLock lCounter = new ReentrantLock(); 
+    public ReentrantLock lCounter = new ReentrantLock();
+
+    private ReentrantLock rewardsL = new ReentrantLock();
+    public Condition c = rewardsL.newCondition();
+
+    boolean aReward = false;
+
 
 
 
@@ -38,15 +46,23 @@ public class Map {
         return this.n;
     }
 
+    public boolean isaReward() {
+        try {
+            lCounter.lock();
+            return aReward;
+        } finally { lCounter.unlock(); }
+    }
 
     public void makeReservation(User user, Location l)
     {
         user.l.lock();
         // verifica se o user já tem alguma reserva e se há scooters livres
-        while (user.getReserv()==null && (l.getFreeScooters() > 0)) { // the location needs to have free scooters
+        if (user.getReserv()==null && (l.getFreeScooters() > 0)) { // the location needs to have free scooters
             lCounter.lock();
             user.setReserv(new Reservation(this.reservationCode, l));
             this.reservationCode++;
+            this.aReward = true;
+            c.signalAll();
             lCounter.unlock();
             l.removeScotter();
         }
@@ -77,6 +93,10 @@ public class Map {
             
         // retirar reservation do user
         user.setReserv(null);
+        lCounter.lock();
+        this.aReward = true;
+        c.signalAll();
+        lCounter.unlock();
         user.l.unlock();
 
         return price;
@@ -100,5 +120,16 @@ public class Map {
         return withFreeScooters;
     }
 
+
+    public HashMap<Location, HashMap<Location,Reward>> showAllRewards()
+    {
+        HashMap<Location,HashMap<Location,Reward>> result = new HashMap<>();
+        int i,j;
+        for (i=0; i<n; i++)
+            for (j=0; i<n; j++)
+                result.put(map[i][j],map[i][j].getRewards());
+
+        return result;
+    }
 
 }

@@ -8,13 +8,13 @@ public class Rewards implements Runnable {
     
     private Map map;
     private final int D = 2;
-    private ReentrantLock rewardsL = new ReentrantLock();
-    private Condition cReservation = rewardsL.newCondition();
-    private Condition cParking = rewardsL.newCondition();
+
+    private int rcode;
 
     public Rewards(Map map)
     {
         this.map = map;
+        this.rcode = 0;
     }
     
     public void createReward(Location locA)
@@ -52,23 +52,21 @@ public class Rewards implements Runnable {
     }
 
 
-    public HashMap<Location,HashMap<Location,Reward>> showAllRewards()
-    {
-        HashMap<Location,HashMap<Location,Reward>> result = new HashMap<>();
-        int i,j;
-        int n = map.getN();
-        for (i=0; i<n; i++) 
-            for (j=0; i<n; j++) 
-                result.put(map.getMap()[i][j],map.getMap()[i][j].getRewards());
-
-        return result;
-    }
-
     public void run() 
     {
         while(true)
         {
-            this.createAllRewards();
+            this.createAllRewards(); // cria todos os rewards
+
+            while (!map.isaReward())
+            {
+                try {
+                    this.map.c.await();
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            map.aReward = false;
         }
     }
 }
