@@ -1,20 +1,18 @@
 package src;
 
+import java.time.LocalDateTime;
+
 public class Reservation {
     
     private Integer code;
     private Location location;
+    private LocalDateTime reservationDate;
 
-    public Reservation(Integer codigo, Location location) 
+    public Reservation(Integer codigo, Location location, LocalDateTime date) 
     {
         this.code = codigo;
-        this.location = location.clone();
-    }
-
-    public Reservation(Reservation r) 
-    {
-        this.code = r.code;
-        this.location = r.location.clone();
+        this.location = location;
+        this.reservationDate = date;
     }
 
     public Integer getCode()
@@ -27,5 +25,8 @@ public class Reservation {
         return this.location;
     }
 
-    public Reservation clone() { return new Reservation(this); }
+    public LocalDateTime getReservationDate()
+    {
+        return this.reservationDate;
+    }
 }

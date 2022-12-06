@@ -1,5 +1,7 @@
 package src;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -56,46 +58,60 @@ public class Map {
     public void makeReservation(User user, Location l)
     {
         user.l.lock();
-        // verifica se o user já tem alguma reserva e se há scooters livres
-        if (user.getReserv()==null && (l.getFreeScooters() > 0)) { // the location needs to have free scooters
+        // verify if the user does not have reservations and if there are free scooters in that location
+        if (user.getReserv()==null && (l.getFreeScooters() > 0)) 
+        {
             lCounter.lock();
-            user.setReserv(new Reservation(this.reservationCode, l));
+
+            //decreases the number of free scooters in the location
+            l.removeScotter();
+
+            //associate revervation to user
+            user.setReserv(new Reservation(this.reservationCode, l,LocalDateTime.now()));
+
+            //increases the number of global reservations done
             this.reservationCode++;
+
+            // was done a reservation, the rewards have to be recalculated
             this.aReward = true;
             c.signalAll();
+
             lCounter.unlock();
-            l.removeScotter();
         }
         user.l.unlock();
     }
 
-    // TO DO : adicionar preço em função do tempo
+    // If there is a reward associated, returns the price of the reward
+    // Else returns the price of the deslocation
     public double parkScooter(User user, Location l) 
     {
-        // tens que ir à location da reserva, pegar nela e fazer a distancia de manhaten e devolver o preco
-        // se houver recompensa, devolve o preço da recompensa
-        
         double price;
         user.l.lock();
 
         // retira da localização anterior e adiciona na presente
+        // decrease number of free scooters in
+
+        // get the location where the reservation was done
         Location prev = user.getReserv().getLocation();
-        prev.removeScotter();
+
+        // increase number of free scooters in this location
         l.addScotter();
 
-        // ver se tem reward
+        // confirm if the deslocation has reward
         if(prev.getRewards().get(l)!=null)
         {
             price = prev.getRewards().get(l).getReward();
         }
-        else price = -prev.distance(l);
+        else price = -(0.7*prev.distance(l)+0.3*ChronoUnit.MINUTES.between(user.getReserv().getReservationDate(), LocalDateTime.now()))/4;
 
-            
-        // retirar reservation do user
+        // remove reservation of user
         user.setReserv(null);
+
+        // was done a parking, the rewards have to be recalculated
         lCounter.lock();
         this.aReward = true;
         c.signalAll();
+
         lCounter.unlock();
         user.l.unlock();
 

@@ -1,20 +1,13 @@
 package src;
 
-import java.util.HashMap;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.ReentrantLock;
-
 public class Rewards implements Runnable {
     
     private Map map;
     private final int D = 2;
 
-    private int rcode;
-
     public Rewards(Map map)
     {
         this.map = map;
-        this.rcode = 0;
     }
     
     public void createReward(Location locA)

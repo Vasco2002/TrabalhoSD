@@ -18,22 +18,15 @@ class ServerWorker implements Runnable
     public ReentrantReadWriteLock l = new ReentrantReadWriteLock();
     private Map map;
 
-    public ServerWorker (Socket socket, String fileMap, String fileUsers) {
+    public ServerWorker (Socket socket, Integer NMap, String fileUsers) {
 
-        // Get the map
-        File f = new File(fileMap);
-        if(!f.exists())
-            map = new Map(20);
-        // else map = Map.parse(fileMap);
-        //else Location = Location.deserialize("Location.ser");
-        
+        // create map
+        map = new Map(NMap);
         
         // Get the users
-        f = new File(fileUsers);
+        File f = new File(fileUsers);
         if(!f.exists())
             this.parserUser(fileUsers);
-        // else users = Users.parse(fileUsers);
-        //else users = users.deserialize("users.ser");
 
         this.socket = socket;
 
@@ -65,14 +58,12 @@ class ServerWorker implements Runnable
     {
         String email;
         String password;
-        try 
+        
+        try (TaggedConnection c = new TaggedConnection(this.socket)) 
         {
-            TaggedConnection c = new TaggedConnection(this.socket);
-
             while (true) 
             {
                 Frame frame = c.receive();
-
                 switch(frame.tag){
                     case -1:
                         //Log in
@@ -141,13 +132,15 @@ class ServerWorker implements Runnable
                         // List rewards
                         c.send(4,"",0,0,0,map.showAllRewards().toString().getBytes());
                         break;
-                        
-                
+                            
+                    
                 }   
-                
+                    
             }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        catch(IOException e){}
+        
     }
 }
 
@@ -156,8 +149,6 @@ class ServerWorker implements Runnable
 
 /**
  * Server-side implementation of the program.
- *
- * Instance of <code>Server</code> must be running before running instance(s) of <code>Client</code>.
  */
 public class Server {
 
@@ -173,7 +164,7 @@ public class Server {
         while(true) 
         {
             Socket socket = serverSocket.accept();
-            Thread worker = new Thread(new ServerWorker(socket, args[1], args[2]));
+            Thread worker = new Thread(new ServerWorker(socket, Integer.parseInt(args[1]), args[2]));
             worker.start();
         }
     }
