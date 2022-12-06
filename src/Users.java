@@ -11,7 +11,8 @@ public class Users {
         this.users = new HashMap<>();
     }
 
-    public boolean hasUser(String email) {
+    public boolean hasUser(String email) 
+    {
         return users.containsKey(email);
     }
 
@@ -22,6 +23,7 @@ public class Users {
     public void addUser(String email, String password) {
         users.put(email, password);
     }
+
 
     /* Nem vou por os imports porque ainda não sei se vamos usar assim :)
 

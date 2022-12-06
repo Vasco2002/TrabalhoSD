@@ -3,12 +3,15 @@ package src;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 class ServerWorker implements Runnable 
 {
     private Socket socket;
-    private Users users;
+    private HashMap<String,User> users;
+    public ReentrantReadWriteLock l = new ReentrantReadWriteLock();
     private Map map;
 
     public ServerWorker (Socket socket, String fileMap, String fileUsers) {
@@ -24,12 +27,18 @@ class ServerWorker implements Runnable
         // Get the users
         f = new File(fileUsers);
         if(!f.exists())
-            users = new Users();
+            users = new HashMap<>();
         // else users = Users.parse(fileUsers);
         //else users = users.deserialize("users.ser");
 
-
         this.socket = socket;
+
+        while(true) 
+        {
+            Thread rewards = new Thread(new Rewards(map));
+            rewards.start();
+        }
+
     }
 
     @Override
@@ -52,11 +61,11 @@ class ServerWorker implements Runnable
                         password = new String(frame.data);
                         // Search password of user saved in mem
                         String stored_password;
-                        users.l.readLock().lock();
+                        l.readLock().lock();
                         try {
-                            stored_password = users.getPassword(email);
+                            stored_password = users.get(email).getPassword();
                         } finally {
-                            users.l.readLock().unlock();
+                            l.readLock().unlock();
                         }
                         if (stored_password != null) 
                         {
@@ -73,16 +82,16 @@ class ServerWorker implements Runnable
                         // User registration
                         email = frame.username;
                         password = new String(frame.data);
-                        users.l.writeLock().lock();
+                        l.writeLock().lock();
                         try {
-                            if(users.hasUser(email))
+                            if(users.containsKey(email))
                                 c.send(-2, "",0,0,0, "Error - Username already exists".getBytes());
                             else {
-                                users.addUser(email, password);
+                                users.put(email, new User(password));
                                 c.send(frame.tag, "",0,0,0, "Username added successfully!".getBytes());
                             }
                         } finally {
-                            users.l.writeLock().unlock();
+                            l.writeLock().unlock();
                         }
                         break;
                     case 1:
@@ -94,13 +103,13 @@ class ServerWorker implements Runnable
                     case 2:
                         // Reservation
                         pos = new Location(frame.x, frame.y);
-                        map.makeReservation(frame.username, pos);
+                        map.makeReservation(users.get(frame.username), pos);
                         c.send(2,"",0,0,0,"Reservation done successfully!".getBytes());
                         break;
                     case 3:
                         // Parking
                         pos = new Location(frame.x, frame.y);
-                        map.parkScooter(frame.username, pos);
+                        map.parkScooter(users.get(frame.username), pos);
                         c.send(3,"",0,0,0,"Parking done successfully!".getBytes());
                         break;
                     case 4:
@@ -111,7 +120,7 @@ class ServerWorker implements Runnable
                         
                     case 5:
                         // List rewards
-                        c.send(4,"",0,0,0,map.showAllRewards().toString().getBytes());
+                        c.send(4,"",0,0,0,rewards.showAllRewards().toString().getBytes());
                         break;
                         
                 

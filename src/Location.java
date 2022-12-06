@@ -1,7 +1,6 @@
 package src;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class Location {
@@ -9,14 +8,15 @@ public class Location {
     public int y;
     public int freeScooters; //number of free scooters at this location
     public ReentrantReadWriteLock l = new ReentrantReadWriteLock();
-    public List<Reward> rewards;
+    public HashMap<Location,Reward> rewards;
+    // lA --> map lB reward(A->B)
 
     public Location(int x, int y) 
     {
         this.x = x;
         this.y = y;
         this.freeScooters = 0;
-        this.rewards = new ArrayList<>();
+        this.rewards = new HashMap<>();
     }
 
     public Location(Location pos) 
@@ -70,7 +70,7 @@ public class Location {
         l.writeLock().unlock();
     }
 
-    public List<Reward> getRewards()
+    public HashMap<Location,Reward> getRewards()
     {
         try {
             l.readLock().lock();
@@ -79,7 +79,7 @@ public class Location {
         finally {l.readLock().unlock();}
     }
 
-    public void setRewards(List<Reward> lr)
+    public void setRewards(HashMap<Location,Reward> lr)
     {
         l.writeLock().lock();
         this.rewards = lr;
@@ -89,7 +89,7 @@ public class Location {
     public void addReward(Reward r)
     {
         l.writeLock().lock();
-        this.rewards.add(r);
+        this.rewards.put(r.b,r);
         l.writeLock().unlock();
     }
 
