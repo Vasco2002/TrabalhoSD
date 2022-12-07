@@ -15,7 +15,7 @@ public class Map {
     private Integer reservationCode = 0; // counter of the reservation
     public ReentrantLock lCounter = new ReentrantLock();
 
-    private ReentrantLock rewardsL = new ReentrantLock();
+    public ReentrantLock rewardsL = new ReentrantLock();
     public Condition c = rewardsL.newCondition();
 
     boolean aReward = false;
@@ -29,7 +29,7 @@ public class Map {
         this.map = new Location[this.n][this.n];
         for (int i=0; i<n; i++) 
         {
-            for (int j=0; i<n; j++) 
+            for (int j=0; j<n; j++)
             {
                 Location novoLocal = new Location(i,j);
                 this.map[i][j] = novoLocal;
@@ -61,7 +61,7 @@ public class Map {
         // verify if the user does not have reservations and if there are free scooters in that location
         if (user.getReserv()==null && (l.getFreeScooters() > 0)) 
         {
-            lCounter.lock();
+
 
             //decreases the number of free scooters in the location
             l.removeScotter();
@@ -70,13 +70,17 @@ public class Map {
             user.setReserv(new Reservation(this.reservationCode, l,LocalDateTime.now()));
 
             //increases the number of global reservations done
+            lCounter.lock();
             this.reservationCode++;
+            lCounter.unlock();
 
             // was done a reservation, the rewards have to be recalculated
+            rewardsL.lock();
             this.aReward = true;
             c.signalAll();
+            rewardsL.unlock();
 
-            lCounter.unlock();
+
         }
         user.l.unlock();
     }
@@ -108,11 +112,11 @@ public class Map {
         user.setReserv(null);
 
         // was done a parking, the rewards have to be recalculated
-        lCounter.lock();
+        rewardsL.lock();
         this.aReward = true;
         c.signalAll();
+        rewardsL.unlock();
 
-        lCounter.unlock();
         user.l.unlock();
 
         return price;

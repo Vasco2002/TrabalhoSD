@@ -20,7 +20,7 @@ public class Rewards implements Runnable {
         {
             for (i=0; i<n; i++) 
             {
-                for (j=0; i<n; j++) 
+                for (j=0; j<n; j++)
                 {
                     Location locB = map.getMap()[i][j];
 
@@ -40,7 +40,7 @@ public class Rewards implements Runnable {
         int i,j;
         int n = map.getN();
         for (i=0; i<n; i++) 
-            for (j=0; i<n; j++) 
+            for (j=0; j<n; j++)
                 createReward(map.getMap()[i][j]);
     }
 
@@ -49,6 +49,7 @@ public class Rewards implements Runnable {
     {
         while(true)
         {
+            this.map.rewardsL.lock();
             this.createAllRewards(); // cria todos os rewards
 
             while (!map.isaReward())
@@ -60,6 +61,7 @@ public class Rewards implements Runnable {
                 }
             }
             map.aReward = false;
+            this.map.rewardsL.unlock();
         }
     }
 }

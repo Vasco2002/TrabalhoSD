@@ -64,8 +64,11 @@ class ServerWorker implements Runnable
             while (true) 
             {
                 Frame frame = c.receive();
+                System.out.println(frame.tag);
                 switch(frame.tag){
-                    case -1:
+
+                    case 6:
+                        System.out.println("Server: start");
                         //Log in
                         email = frame.username;
                         password = new String(frame.data);
@@ -82,20 +85,21 @@ class ServerWorker implements Runnable
                             if (stored_password.equals(password)) 
                             {
                                 // passwords match
-                                c.send(-1, "", 0,0,0,"Session started successfully!".getBytes());
+                                c.send(6, "", 0,0,0,"Session started successfully!".getBytes());
                             }
-                            else c.send(-1, "",0,0,0, "Error - Wrong Password.".getBytes());
+                            else c.send(6, "",0,0,0, "Error - Wrong Password.".getBytes());
                         } else
-                            c.send(-1, "",0,0,0, "Error - Account doesn't exist.".getBytes());
+                            c.send(6, "",0,0,0, "Error - Account doesn't exist.".getBytes());
+                        System.out.println("Server: end");
                         break;
-                    case -2:
+                    case 7:
                         // User registration
                         email = frame.username;
                         password = new String(frame.data);
                         l.writeLock().lock();
                         try {
                             if(users.containsKey(email))
-                                c.send(-2, "",0,0,0, "Error - Username already exists".getBytes());
+                                c.send(7, "",0,0,0, "Error - Username already exists".getBytes());
                             else {
                                 users.put(email, new User(password));
                                 c.send(frame.tag, "",0,0,0, "Username added successfully!".getBytes());
