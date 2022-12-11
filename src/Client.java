@@ -3,7 +3,6 @@ package src;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.Socket;
-import  src.*;
 
 /**
  * Client-side implementation of the program.

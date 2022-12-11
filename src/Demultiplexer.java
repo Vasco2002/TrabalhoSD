@@ -42,6 +42,11 @@ public class Demultiplexer {
                         }
                         fv.queue.add(frame.data);
                         fv.c.signal();
+                        // if one thread gets exception, wake up all
+                        if (exception != null) 
+                            while(fv.waiters>0) // n threads sleeping
+                                fv.c.signal();
+                        
                     }
                     finally {
                         l.unlock();
