@@ -27,6 +27,10 @@ public class TaggedConnection implements AutoCloseable {
         try {
             wl.lock();
             this.dos.writeInt(frame.tag);
+            this.dos.writeUTF(frame.username);
+            this.dos.writeInt(frame.x);
+            this.dos.writeInt(frame.y);
+            this.dos.writeInt(frame.r);
             this.dos.writeInt(frame.data.length);
             this.dos.write(frame.data);
             this.dos.flush();
@@ -47,7 +51,6 @@ public class TaggedConnection implements AutoCloseable {
         byte[] data;
         try {
             rl.lock();
-            System.out.println(this.dis.readInt());
             tag = this.dis.readInt();
             username = this.dis.readUTF();
             x = this.dis.readInt();

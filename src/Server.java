@@ -5,6 +5,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -14,7 +15,7 @@ import java.nio.file.Paths;
 class ServerWorker implements Runnable 
 {
     private Socket socket;
-    private HashMap<String,User> users;
+    private HashMap<String,User> users = new HashMap<>();
     public ReentrantReadWriteLock l = new ReentrantReadWriteLock();
     private Map map;
 
@@ -25,13 +26,15 @@ class ServerWorker implements Runnable
         
         // Get the users
         File f = new File(fileUsers);
-        if(!f.exists())
+        if(f.exists())
             this.parserUser(fileUsers);
 
         this.socket = socket;
 
         Thread rewards = new Thread(new Rewards(map));
         rewards.start();
+
+        System.out.print(socket);
 
     }
 
@@ -48,7 +51,7 @@ class ServerWorker implements Runnable
         List<String> linhas = readFile(fileUsers);
         String[] parts;
         for (String linha : linhas) {
-            parts = linha.split(";\n");
+            parts = linha.split(";");
             this.users.put(parts[0],new User(parts[1]));
         }
     }
@@ -58,13 +61,14 @@ class ServerWorker implements Runnable
     {
         String email;
         String password;
-        
+        Location pos;
         try (TaggedConnection c = new TaggedConnection(this.socket)) 
         {
-            while (true) 
+            while (true)
             {
                 Frame frame = c.receive();
                 System.out.println(frame.tag);
+                System.out.println("here2");
                 switch(frame.tag){
 
                     case 6:
@@ -110,25 +114,30 @@ class ServerWorker implements Runnable
                         break;
                     case 1:
                         // List locations with close free scooters
-                        Location pos = new Location(frame.x, frame.y);
+                        pos = map.getMap()[frame.x][frame.y];
                         List<Location> result = map.locationsFreeScooters(frame.r, pos);
                         c.send(1,"",0,0,0,result.toString().getBytes());
                         break;
                     case 2:
                         // Reservation
-                        pos = new Location(frame.x, frame.y);
+                        pos = map.getMap()[frame.x][frame.y];
                         map.makeReservation(users.get(frame.username), pos);
                         c.send(2,"",0,0,0,"Reservation done successfully!".getBytes());
                         break;
                     case 3:
                         // Parking
-                        pos = new Location(frame.x, frame.y);
-                        map.parkScooter(users.get(frame.username), pos);
-                        c.send(3,"",0,0,0,"Parking done successfully!".getBytes());
+                        double price;
+                        pos = map.getMap()[frame.x][frame.y];
+                        System.out.println("User2:" + users.get(frame.username).getPassword());
+                        if (users.get(frame.username).getReserv()!=null) {
+                            price = map.parkScooter(users.get(frame.username), pos);
+                            String s = "Parking done successfully!\n" + "Trip cost: " + price;
+                            c.send(3, "", 0, 0, 0, s.getBytes());
+                        } else c.send(3, "", 0, 0, 0, "You don't have reservation!".getBytes());
                         break;
                     case 4:
                         // There are close rewards
-                        pos = new Location(frame.x, frame.y);
+                        pos = map.getMap()[frame.x][frame.y];
                         c.send(4,"",0,0,0,pos.getRewards().toString().getBytes());
                         break;
                         
@@ -163,7 +172,6 @@ public class Server {
     public static void main(String[] args) throws Exception 
     {
         ServerSocket serverSocket = new ServerSocket(Integer.parseInt(args[0]));
-
         /* Every time a new Client tries to connect, accept that connection, run a worker to handle the client and go back to waiting for new clients. */
         while(true) 
         {

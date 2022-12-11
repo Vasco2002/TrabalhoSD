@@ -14,7 +14,7 @@ import  src.*;
 public class Client {
     public static void main(String[] args) throws Exception 
     {
-        Socket s = new Socket("localhost", 5555);
+        Socket s = new Socket("localhost",5555);
         Demultiplexer m = new Demultiplexer(new TaggedConnection(s));
 
         m.start();
@@ -40,6 +40,7 @@ public class Client {
                 String email = stdin.readLine();
                 System.out.print("Password: ");
                 String password = stdin.readLine();
+                System.out.println(email);
                 m.send(6, email, 0, 0, 0, password.getBytes());
                 String response = new String(m.receive(6));
                 if(!response.startsWith("Error")) {
@@ -83,45 +84,47 @@ public class Client {
                     + "0) Exit.\n"
                     + "\n"
                     + "Enter the correspondent value: ");
-            int option = stdin.read();
+            String option = stdin.readLine();
+            System.out.println("\nOption: " + option + "\n");
+            int x, y, r;
+            String response;
             switch(option) {
-                case 0:
+                case "0":
                     exit = true;
                     break;
-                case 1:
+                case "1":
                     System.out.println("Enter your current location:\n"
                             + "x: ");
-                    int x = stdin.read();
-                    System.out.print("\ny: ");
-                    int y = stdin.read();
+                    x = Integer.parseInt(stdin.readLine());
+                    System.out.println("y: ");
+                    y = Integer.parseInt(stdin.readLine());
                     System.out.println("Radius:");
-                    int r = stdin.read();
-                    m.send(1, username, x, y, r, null);
-                    String response = new String(m.receive(1));
+                    r = Integer.parseInt(stdin.readLine());
+                    m.send(1, username, x, y, r, "".getBytes());
+                    response = new String(m.receive(1));
                     System.out.println("\n" + response + "\n");
                     break;
-                case 2:
+                case "2":
                     System.out.println("Enter your current location:\n"
                             + "x: ");
-                    x = stdin.read();
-                    System.out.print("\ny: ");
-                    y = stdin.read();
-                    m.send(2, username, x, y, 0, null);
+                    x = Integer.parseInt(stdin.readLine());
+                    System.out.println("y: ");
+                    y = Integer.parseInt(stdin.readLine());
+                    m.send(2, username, x, y, 0, "".getBytes());
                     response = new String(m.receive(2));
                     System.out.println("\n" + response + "\n");
                     break;
-                case 3:
-                    // m.send(3,blabla)
+                case "3":
                     System.out.println("Enter the location which you want to park the scooter:\n"
                             + "x: ");
-                    x = stdin.read();
-                    System.out.print("\ny: ");
-                    y = stdin.read();
-                    m.send(3, username, x, y, 0, null);
+                    x = Integer.parseInt(stdin.readLine());
+                    System.out.println("y: ");
+                    y = Integer.parseInt(stdin.readLine());
+                    m.send(3, username, x, y, 0, "".getBytes());
                     response = new String(m.receive(3));
                     System.out.println("\n" + response + "\n");
                     break;
-                case 4:
+                case "4":
                     System.out.println("Enter your current location:\n"
                             + "x: ");
                     x = stdin.read();
@@ -131,7 +134,7 @@ public class Client {
                     response = new String(m.receive(4));
                     System.out.println("\n" + response + "\n");
                     break;
-                case 5:
+                case "5":
                     m.send(5, username, 0, 0, 0, null);
                     response = new String(m.receive(5));
                     System.out.println("\n" + response + "\n");

@@ -1,3 +1,2 @@
-joana@yahoo.com;232
-a96361@alunos.uminho.pt;soubuefixe
-
+joana;232;
+a96361;soubuefixe;

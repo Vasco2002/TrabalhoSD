@@ -5,6 +5,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -35,6 +36,22 @@ public class Map {
                 this.map[i][j] = novoLocal;
             }
         }
+        this.fillScooters();
+    }
+
+    public void fillScooters(){
+        Random rand = new Random();
+        for (int i=0; i<n; i++)
+        {
+            for (int j=0; j<n; j++)
+            {
+                int random = rand.nextInt(this.n/2);
+                for(; random > 0; random--)
+                    this.map[i][j].addScotter();
+
+                System.out.println("("+i+","+j+"):" + map[i][j].getFreeScooters());
+            }
+        }
     }
 
 
@@ -55,19 +72,19 @@ public class Map {
         } finally { lCounter.unlock(); }
     }
 
-    public void makeReservation(User user, Location l)
+    public void makeReservation(User user, Location location)
     {
         user.l.lock();
+        System.out.println("User: " + user.getPassword());
         // verify if the user does not have reservations and if there are free scooters in that location
-        if (user.getReserv()==null && (l.getFreeScooters() > 0)) 
+        System.out.println("Free scooters: " + location.getFreeScooters());
+        if (user.getReserv()==null && (location.getFreeScooters() > 0))
         {
-
-
             //decreases the number of free scooters in the location
-            l.removeScotter();
+            location.removeScotter();
 
             //associate revervation to user
-            user.setReserv(new Reservation(this.reservationCode, l,LocalDateTime.now()));
+            user.setReserv(new Reservation(this.reservationCode, location,LocalDateTime.now()));
 
             //increases the number of global reservations done
             lCounter.lock();
@@ -87,10 +104,13 @@ public class Map {
 
     // If there is a reward associated, returns the price of the reward
     // Else returns the price of the deslocation
-    public double parkScooter(User user, Location l) 
+    public double parkScooter(User user, Location location)
     {
         double price;
         user.l.lock();
+
+        System.out.println("User: " + user.getPassword());
+
 
         // retira da localização anterior e adiciona na presente
         // decrease number of free scooters in
@@ -99,14 +119,14 @@ public class Map {
         Location prev = user.getReserv().getLocation();
 
         // increase number of free scooters in this location
-        l.addScotter();
+        location.addScotter();
 
         // confirm if the deslocation has reward
-        if(prev.getRewards().get(l)!=null)
+        if(prev.getRewards().get(location)!=null)
         {
-            price = prev.getRewards().get(l).getReward();
+            price = prev.getRewards().get(location).getReward();
         }
-        else price = -(0.7*prev.distance(l)+0.3*ChronoUnit.MINUTES.between(user.getReserv().getReservationDate(), LocalDateTime.now()))/4;
+        else price = -(0.7*prev.distance(location)+0.3*ChronoUnit.MINUTES.between(user.getReserv().getReservationDate(), LocalDateTime.now()))/4;
 
         // remove reservation of user
         user.setReserv(null);
@@ -129,7 +149,7 @@ public class Map {
 
         for (int i=0; i<n; i++)
         {
-            for (int j=0; i<n; j++)
+            for (int j=0; j<n; j++)
             {
                 if(map[i][j].distance(location)<=d)
                     if(map[i][j].getFreeScooters() > 0)
