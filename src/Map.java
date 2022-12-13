@@ -9,6 +9,8 @@ import java.util.Random;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
+import static java.lang.Math.abs;
+
 public class Map {
 
     private int n; // Number of lines/columns of the map
@@ -41,11 +43,14 @@ public class Map {
 
     public void fillScooters(){
         Random rand = new Random();
+        int random = 0;
         for (int i=0; i<n; i++)
         {
             for (int j=0; j<n; j++)
             {
-                int random = rand.nextInt(3);
+                if(i<5 && j<5)random = rand.nextInt(i+j+1);
+                else random = (i+j)/(rand.nextInt(j+i)+1);
+                random--;
                 for(; random > 0; random--)
                     this.map[i][j].addScotter();
             }
@@ -169,12 +174,27 @@ public class Map {
             int i,j;
             for (i=0; i<n; i++)
                 for (j=0; j<n; j++) {
-                    result.put(map[i][j], map[i][j].getRewards());
-                    System.out.println(map[i][j].getRewards());
+                    if(map[i][j].getRewards()!=null)
+                        result.put(map[i][j], map[i][j].getRewards());
+                    System.out.println("(" + i + "," + j + "): " + map[i][j].getRewards());
                 }
 
             return result;
         } finally {rewardsL.unlock();}
+    }
+
+    public String printMap()
+    {
+        System.out.println("here");
+        String r = "";
+        for (int i=0; i<n; i++) {
+            for (int j = 0; j < n; j++) {
+                //System.out.println(this.map[i][j].getFreeScooters());
+                r +=  Integer. toString(this.map[i][j].getFreeScooters()) + " ";
+            }
+            r+="\n";
+        }
+        return r;
     }
 
 }

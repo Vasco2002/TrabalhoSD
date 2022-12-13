@@ -23,16 +23,68 @@ public class Rewards implements Runnable {
                 for (j=0; j<n; j++)
                 {
                     Location locB = map.getMap()[i][j];
-                    System.out.println("Hello" + map.locationsFreeScooters(D,locB).size());
+                    System.out.println(i + "," + j + ": " + map.locationsFreeScooters(D,locB).size());
                     if(map.locationsFreeScooters(D,locB).size()==0)
                     {
                         System.out.println("HEREEEEEEEEEEEEEEE");
                         Double priceReward = (locA.getFreeScooters() * 0.6 + locA.distance(locB) * 0.4)/2;
                         locA.addReward(new Reward(locB, priceReward));
+                        System.out.println("N rewards:" + locA.getRewards().size());
                     }
                 }
             }
         }
+    }
+
+
+    public void createReward2()
+    {
+        int i,j;
+        int n = this.map.getN();
+
+        // limpa todos os rewards antigos
+        for (i=0; i<n; i++) {
+            for (j = 0; j < n; j++) {
+                this.map.getMap()[i][j].setRewards(null);
+            }
+        }
+
+        // verifica para cada localização se tem scooters perto, se não tiver, para todas as outras
+        // localizações é criada uma recompensa
+        for (i=0; i<n; i++)
+        {
+            for (j=0; j<n; j++)
+            {
+                Location locB = map.getMap()[i][j];
+                if(map.locationsFreeScooters(D,locB).size()==0)
+                {
+                    //System.out.println("LocB:" + i + "," + j + map.locationsFreeScooters(D,locB).size());
+                    this.createAllRewards2(locB);
+                }
+            }
+        }
+
+
+
+    }
+
+    public void createAllRewards2(Location locB)
+    {
+        int i,j;
+        int n = map.getN();
+
+        for (i=0; i<n; i++)
+            for (j=0; j<n; j++)
+            {
+                Location locA = map.getMap()[i][j];
+                // apenas cria reward se a localização tiver scooters livres
+                if(locA!=locB && locA.getFreeScooters()>1)
+                {
+                    //System.out.println("criou:" + i + "," + j);
+                    Double priceReward = (locA.getFreeScooters() * 0.6 + locA.distance(locB) * 0.4)/2;
+                    locA.addReward(new Reward(locB, priceReward));
+                }
+            }
     }
 
 
@@ -53,7 +105,8 @@ public class Rewards implements Runnable {
         while(true)
         {
             this.map.rewardsL.lock();
-            this.createAllRewards(); // cria todos os rewards
+            //this.createAllRewards(); // cria todos os rewards
+            this.createReward2();
 
             while (!map.isaReward())
             {

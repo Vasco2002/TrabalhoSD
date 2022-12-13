@@ -62,6 +62,7 @@ class ServerWorker implements Runnable
         Location pos;
         try (TaggedConnection c = new TaggedConnection(this.socket)) 
         {
+            System.out.println(map.printMap());
             while (true)
             {
                 Frame frame = c.receive();
