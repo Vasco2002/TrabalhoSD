@@ -49,7 +49,7 @@ public class Map {
             for (int j=0; j<n; j++)
             {
                 if(i<5 && j<5)random = rand.nextInt(i+j+1);
-                else random = (i+j)/(rand.nextInt(j+i)+1);
+                else random = ((i+j)/(rand.nextInt(j+i)+1))/2;
                 random--;
                 for(; random > 0; random--)
                     this.map[i][j].addScotter();
@@ -175,12 +175,20 @@ public class Map {
             for (i=0; i<n; i++)
                 for (j=0; j<n; j++) {
                     if(map[i][j].getRewards()!=null)
+                    {
                         result.put(map[i][j], map[i][j].getRewards());
-                    System.out.println("(" + i + "," + j + "): " + map[i][j].getRewards());
+                        System.out.println("(" + i + "," + j + "): " + map[i][j].getRewards());
+                    }
                 }
 
             return result;
         } finally {rewardsL.unlock();}
+    }
+
+
+    public List hashToList(HashMap<Location, HashMap<Location,Reward>>)
+    {
+        return null;
     }
 
     public String printMap()

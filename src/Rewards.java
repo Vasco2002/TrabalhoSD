@@ -9,35 +9,8 @@ public class Rewards implements Runnable {
     {
         this.map = map;
     }
-    
-    public void createReward(Location locA)
-    {
-        locA.setRewards(null); //clean list of rewards
-        int i,j;
-        int n = this.map.getN();
-        if(locA.getFreeScooters()>1)
-        {
-            System.out.println(locA.getFreeScooters());
-            for (i=0; i<n; i++) 
-            {
-                for (j=0; j<n; j++)
-                {
-                    Location locB = map.getMap()[i][j];
-                    System.out.println(i + "," + j + ": " + map.locationsFreeScooters(D,locB).size());
-                    if(map.locationsFreeScooters(D,locB).size()==0)
-                    {
-                        System.out.println("HEREEEEEEEEEEEEEEE");
-                        Double priceReward = (locA.getFreeScooters() * 0.6 + locA.distance(locB) * 0.4)/2;
-                        locA.addReward(new Reward(locB, priceReward));
-                        System.out.println("N rewards:" + locA.getRewards().size());
-                    }
-                }
-            }
-        }
-    }
 
-
-    public void createReward2()
+    public void createReward()
     {
         int i,j;
         int n = this.map.getN();
@@ -57,18 +30,12 @@ public class Rewards implements Runnable {
             {
                 Location locB = map.getMap()[i][j];
                 if(map.locationsFreeScooters(D,locB).size()==0)
-                {
-                    //System.out.println("LocB:" + i + "," + j + map.locationsFreeScooters(D,locB).size());
-                    this.createAllRewards2(locB);
-                }
+                    this.createAllRewards(locB);
             }
         }
-
-
-
     }
 
-    public void createAllRewards2(Location locB)
+    public void createAllRewards(Location locB)
     {
         int i,j;
         int n = map.getN();
@@ -80,33 +47,18 @@ public class Rewards implements Runnable {
                 // apenas cria reward se a localização tiver scooters livres
                 if(locA!=locB && locA.getFreeScooters()>1)
                 {
-                    //System.out.println("criou:" + i + "," + j);
                     Double priceReward = (locA.getFreeScooters() * 0.6 + locA.distance(locB) * 0.4)/2;
                     locA.addReward(new Reward(locB, priceReward));
                 }
             }
     }
 
-
-    public void createAllRewards()
-    {
-        int i,j;
-        int n = map.getN();
-        for (i=0; i<n; i++) 
-            for (j=0; j<n; j++) {
-                createReward(map.getMap()[i][j]);
-                System.out.println(map.getMap()[i][j].getRewards());
-            }
-    }
-
-
     public void run() 
     {
         while(true)
         {
             this.map.rewardsL.lock();
-            //this.createAllRewards(); // cria todos os rewards
-            this.createReward2();
+            this.createReward();  // cria todos os rewards
 
             while (!map.isaReward())
             {
