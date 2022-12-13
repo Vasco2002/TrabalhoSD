@@ -47,6 +47,20 @@ public class Location {
 
     public Location clone() { return new Location(this); }
 
+    public int getX() {
+        try {
+            l.readLock().lock();
+            return x;
+        }finally {l.readLock().unlock();}
+    }
+
+    public int getY() {
+        try {
+            l.readLock().lock();
+            return y;
+        }finally {l.readLock().unlock();}
+    }
+
     public int getFreeScooters()
     {
         try {
@@ -72,25 +86,30 @@ public class Location {
 
     public HashMap<Location,Reward> getRewards()
     {
-        try {
-            l.readLock().lock();
-            return this.rewards;
-        }
-        finally {l.readLock().unlock();}
+        return this.rewards;
     }
 
     public void setRewards(HashMap<Location,Reward> lr)
     {
-        l.writeLock().lock();
         this.rewards = lr;
-        l.writeLock().unlock();
     }
 
     public void addReward(Reward r)
     {
-        l.writeLock().lock();
+        if(this.rewards==null) this.rewards = new HashMap<>();
         this.rewards.put(r.b,r);
-        l.writeLock().unlock();
     }
 
+    public String rewardsToString(HashMap<Location,Reward> r){
+        try {
+            l.readLock().lock();
+            if(r==null) return "There's no rewards around your area!";
+            String s = "";
+            for (Location l : r.keySet()) {
+                s += "Location " + "(" + l.getX() + "," + l.getY() + "): " + r.get(l).getReward() + "\n";
+            }
+            return s;
+        }finally {l.readLock().unlock();}
+
+    }
 }

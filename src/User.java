@@ -26,7 +26,6 @@ public class User {
 
     public void setReserv(Reservation r)
     {
-        System.out.println("Reserva: " + r.getCode());
         this.reserv=r;
     }
 

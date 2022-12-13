@@ -127,15 +127,15 @@ public class Client {
                 case "4":
                     System.out.println("Enter your current location:\n"
                             + "x: ");
-                    x = stdin.read();
-                    System.out.print("\ny: ");
-                    y = stdin.read();
-                    m.send(4, username, x, y, 0, null);
+                    x = Integer.parseInt(stdin.readLine());
+                    System.out.println("y: ");
+                    y = Integer.parseInt(stdin.readLine());
+                    m.send(4, username, x, y, 0, "".getBytes());
                     response = new String(m.receive(4));
                     System.out.println("\n" + response + "\n");
                     break;
                 case "5":
-                    m.send(5, username, 0, 0, 0, null);
+                    m.send(5, username, 0, 0, 0, "".getBytes());
                     response = new String(m.receive(5));
                     System.out.println("\n" + response + "\n");
                     break;

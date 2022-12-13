@@ -34,8 +34,6 @@ class ServerWorker implements Runnable
         Thread rewards = new Thread(new Rewards(map));
         rewards.start();
 
-        System.out.print(socket);
-
     }
 
     public List<String> readFile(String nomeFich) {
@@ -67,8 +65,6 @@ class ServerWorker implements Runnable
             while (true)
             {
                 Frame frame = c.receive();
-                System.out.println(frame.tag);
-                System.out.println("here2");
                 switch(frame.tag){
 
                     case 6:
@@ -128,7 +124,6 @@ class ServerWorker implements Runnable
                         // Parking
                         double price;
                         pos = map.getMap()[frame.x][frame.y];
-                        System.out.println("User2:" + users.get(frame.username).getPassword());
                         if (users.get(frame.username).getReserv()!=null) {
                             price = map.parkScooter(users.get(frame.username), pos);
                             String s = "Parking done successfully!\n" + "Trip cost: " + price;
@@ -138,7 +133,7 @@ class ServerWorker implements Runnable
                     case 4:
                         // There are close rewards
                         pos = map.getMap()[frame.x][frame.y];
-                        c.send(4,"",0,0,0,pos.getRewards().toString().getBytes());
+                        c.send(4,"",0,0,0,pos.rewardsToString(pos.getRewards()).getBytes());
                         break;
                         
                     case 5:

@@ -45,11 +45,9 @@ public class Map {
         {
             for (int j=0; j<n; j++)
             {
-                int random = rand.nextInt(this.n/2);
+                int random = rand.nextInt(3);
                 for(; random > 0; random--)
                     this.map[i][j].addScotter();
-
-                System.out.println("("+i+","+j+"):" + map[i][j].getFreeScooters());
             }
         }
     }
@@ -106,7 +104,7 @@ public class Map {
     // Else returns the price of the deslocation
     public double parkScooter(User user, Location location)
     {
-        double price;
+        double price = 0;
         user.l.lock();
 
         System.out.println("User: " + user.getPassword());
@@ -122,11 +120,13 @@ public class Map {
         location.addScotter();
 
         // confirm if the deslocation has reward
-        if(prev.getRewards().get(location)!=null)
-        {
-            price = prev.getRewards().get(location).getReward();
-        }
-        else price = -(0.7*prev.distance(location)+0.3*ChronoUnit.MINUTES.between(user.getReserv().getReservationDate(), LocalDateTime.now()))/4;
+        if(prev.getRewards() != null && prev.getRewards().containsKey(location)){
+            System.out.println(prev.getRewards().get(location));
+            price = prev.getRewards().get(location).getReward();}
+
+        else price = -(0.7 * prev.distance(location) + 0.3 * ChronoUnit.MINUTES.between(user.getReserv().getReservationDate(), LocalDateTime.now())) / 4;
+
+
 
         // remove reservation of user
         user.setReserv(null);
@@ -163,13 +163,18 @@ public class Map {
 
     public HashMap<Location, HashMap<Location,Reward>> showAllRewards()
     {
-        HashMap<Location,HashMap<Location,Reward>> result = new HashMap<>();
-        int i,j;
-        for (i=0; i<n; i++)
-            for (j=0; i<n; j++)
-                result.put(map[i][j],map[i][j].getRewards());
+        try{
+            this.rewardsL.lock();
+            HashMap<Location,HashMap<Location,Reward>> result = new HashMap<>();
+            int i,j;
+            for (i=0; i<n; i++)
+                for (j=0; j<n; j++) {
+                    result.put(map[i][j], map[i][j].getRewards());
+                    System.out.println(map[i][j].getRewards());
+                }
 
-        return result;
+            return result;
+        } finally {rewardsL.unlock();}
     }
 
 }
