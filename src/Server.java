@@ -60,16 +60,15 @@ class ServerWorker implements Runnable
         String email;
         String password;
         Location pos;
+        System.out.println(map.printMap());
         try (TaggedConnection c = new TaggedConnection(this.socket)) 
         {
-            System.out.println(map.printMap());
             while (true)
             {
                 Frame frame = c.receive();
                 switch(frame.tag){
 
                     case 6:
-                        System.out.println("Server: start");
                         //Log in
                         email = frame.username;
                         password = new String(frame.data);
@@ -91,7 +90,6 @@ class ServerWorker implements Runnable
                             else c.send(6, "",0,0,0, "Error - Wrong Password.".getBytes());
                         } else
                             c.send(6, "",0,0,0, "Error - Account doesn't exist.".getBytes());
-                        System.out.println("Server: end");
                         break;
                     case 7:
                         // User registration
@@ -118,8 +116,14 @@ class ServerWorker implements Runnable
                     case 2:
                         // Reservation
                         pos = map.getMap()[frame.x][frame.y];
-                        map.makeReservation(users.get(frame.username), pos);
-                        c.send(2,"",0,0,0,"Reservation done successfully!".getBytes());
+                        int r = map.makeReservation(users.get(frame.username), pos);
+                        if(r == 1)
+                            c.send(2,"",0,0,0,"No scooters in this location!".getBytes());
+                        else if (r==0)
+                            c.send(2,"",0,0,0,"Reservation done successfully!".getBytes());
+                        else
+                            c.send(2,"",0,0,0,"You already have a reservation!".getBytes());
+                        System.out.println(map.printMap());
                         break;
                     case 3:
                         // Parking
@@ -130,16 +134,18 @@ class ServerWorker implements Runnable
                             String s = "Parking done successfully!\n" + "Trip cost: " + price;
                             c.send(3, "", 0, 0, 0, s.getBytes());
                         } else c.send(3, "", 0, 0, 0, "You don't have reservation!".getBytes());
+                        System.out.println(map.printMap());
                         break;
                     case 4:
                         // There are close rewards
                         pos = map.getMap()[frame.x][frame.y];
-                        c.send(4,"",0,0,0,pos.rewardsToString(pos.getRewards()).getBytes());
+                        c.send(4,"",0,0,0,this.map.showSomeRewards(pos,frame.r).getBytes());
                         break;
                         
                     case 5:
                         // List rewards
-                        c.send(4,"",0,0,0,map.showAllRewards().toString().getBytes());
+                        c.send(5,"",0,0,0,map.showAllRewards().getBytes());
+                        System.out.println(this.map.printMapRewards());
                         break;
                             
                     

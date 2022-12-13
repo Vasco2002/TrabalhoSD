@@ -24,7 +24,6 @@ public class Client {
         String username = null;
 
         while (username == null) {
-            System.out.println("Client: start");
             System.out.print("**** Welcome to scooters app! ****\n"
                            + "\n"
                            + "Do you have an account?\n"
@@ -40,14 +39,12 @@ public class Client {
                 String email = stdin.readLine();
                 System.out.print("Password: ");
                 String password = stdin.readLine();
-                System.out.println(email);
                 m.send(6, email, 0, 0, 0, password.getBytes());
                 String response = new String(m.receive(6));
                 if(!response.startsWith("Error")) {
                     username = email;
                 }
                 System.out.println("\n" + response + "\n");
-                System.out.println("Client: end");
             }
             else if (option.equals("2")) {
                 System.out.print("***CREATE ACCOUNT***\n"
@@ -64,11 +61,6 @@ public class Client {
                 System.out.println("\n" + response + "\n");
             }
         }
-
-
-        System.out.print("***Welcome to scooters app!***");
-
-        // Falta ver se está dentro dos limites
 
         boolean exit = false;
 
@@ -130,7 +122,9 @@ public class Client {
                     x = Integer.parseInt(stdin.readLine());
                     System.out.println("y: ");
                     y = Integer.parseInt(stdin.readLine());
-                    m.send(4, username, x, y, 0, "".getBytes());
+                    System.out.println("Radius:");
+                    r = Integer.parseInt(stdin.readLine());
+                    m.send(4, username, x, y, r, "".getBytes());
                     response = new String(m.receive(4));
                     System.out.println("\n" + response + "\n");
                     break;

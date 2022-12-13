@@ -27,11 +27,9 @@ public class Demultiplexer {
     }
 
     public void start() {
-        System.out.println("here");
         new Thread(() -> {
             try {
                 while (true) {
-                    System.out.println("here");
                     Frame frame = tc.receive();
                     l.lock();
                     try {

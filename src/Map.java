@@ -75,34 +75,49 @@ public class Map {
         } finally { lCounter.unlock(); }
     }
 
-    public void makeReservation(User user, Location location)
+    /**
+     * Make a reservation
+     * @param user
+     * @param location
+     * @return -1 if the user already has one reservation
+     * @return 0 if the reservation is done successfully
+     * @return 1 if there are no scooters free in the specific location
+     */
+    public int makeReservation(User user, Location location)
     {
-        user.l.lock();
-        System.out.println("User: " + user.getPassword());
-        // verify if the user does not have reservations and if there are free scooters in that location
-        System.out.println("Free scooters: " + location.getFreeScooters());
-        if (user.getReserv()==null && (location.getFreeScooters() > 0))
-        {
-            //decreases the number of free scooters in the location
-            location.removeScotter();
+        try {
+            user.l.lock();
+            // verify if the user does not have reservations and if there are free scooters in that location
+            System.out.println("Free scooters: " + location.getFreeScooters());
 
-            //associate revervation to user
-            user.setReserv(new Reservation(this.reservationCode, location,LocalDateTime.now()));
+            if(user.getReserv() == null) {
+                if (location.getFreeScooters() > 0) {
+                    //decreases the number of free scooters in the location
+                    location.removeScotter();
 
-            //increases the number of global reservations done
-            lCounter.lock();
-            this.reservationCode++;
-            lCounter.unlock();
+                    //associate revervation to user
+                    user.setReserv(new Reservation(this.reservationCode, location, LocalDateTime.now()));
 
-            // was done a reservation, the rewards have to be recalculated
-            rewardsL.lock();
-            this.aReward = true;
-            c.signalAll();
-            rewardsL.unlock();
+                    //increases the number of global reservations done
+                    lCounter.lock();
+                    this.reservationCode++;
+                    lCounter.unlock();
 
+                    // was done a reservation, the rewards have to be recalculated
+                    rewardsL.lock();
+                    this.aReward = true;
+                    c.signalAll();
+                    rewardsL.unlock();
 
+                    return 0;
+                }
+                else return 1;
+
+            }
+            else return  -1;
+        } finally {
+            user.l.unlock();
         }
-        user.l.unlock();
     }
 
     // If there is a reward associated, returns the price of the reward
@@ -166,18 +181,18 @@ public class Map {
     }
 
 
-    public HashMap<Location, HashMap<Location,Reward>> showAllRewards()
+    public String showAllRewards()
     {
         try{
             this.rewardsL.lock();
-            HashMap<Location,HashMap<Location,Reward>> result = new HashMap<>();
+            String result = "";
             int i,j;
             for (i=0; i<n; i++)
                 for (j=0; j<n; j++) {
                     if(map[i][j].getRewards()!=null)
                     {
-                        result.put(map[i][j], map[i][j].getRewards());
-                        System.out.println("(" + i + "," + j + "): " + map[i][j].getRewards());
+                        result += map[i][j].rewardsToString(map[i][j]) + "\n";
+                        //System.out.println("(" + i + "," + j + "): " + map[i][j].getRewards());
                     }
                 }
 
@@ -185,20 +200,55 @@ public class Map {
         } finally {rewardsL.unlock();}
     }
 
-
-    public List hashToList(HashMap<Location, HashMap<Location,Reward>>)
+    public String showSomeRewards(Location l, int D)
     {
-        return null;
+        try{
+            this.rewardsL.lock();
+            String result = "";
+            int i,j;
+
+            int initX = l.getX()-D;
+            if(initX<0) initX=0;
+
+            int endX = l.getX()+D;
+            if(endX>=this.n) endX=this.n-1;
+
+            int initY = l.getY()-D;
+            if(initY<0) initY=0;
+
+            int endY = l.getY()+D;
+            if(endY>=this.n) endY=this.n-1;
+
+            for (i=initX; i<=endX; i++)
+                for (j=initY; j<=endY; j++)
+                    if(map[i][j].getRewards()!=null && map[i][j].distance(l)<=2)
+                        result += map[i][j].rewardsToString(map[i][j]) + "\n";
+
+            return result;
+        } finally {rewardsL.unlock();}
     }
+
 
     public String printMap()
     {
-        System.out.println("here");
         String r = "";
         for (int i=0; i<n; i++) {
             for (int j = 0; j < n; j++) {
-                //System.out.println(this.map[i][j].getFreeScooters());
                 r +=  Integer. toString(this.map[i][j].getFreeScooters()) + " ";
+            }
+            r+="\n";
+        }
+        return r;
+    }
+
+    public String printMapRewards()
+    {
+        String r = "";
+        for (int i=0; i<n; i++) {
+            for (int j = 0; j < n; j++) {
+                if(this.map[i][j].getRewards()!=null)
+                    r += "X";
+                else r+="-";
             }
             r+="\n";
         }

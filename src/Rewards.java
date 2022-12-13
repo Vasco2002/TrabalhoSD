@@ -1,5 +1,8 @@
 package src;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 public class Rewards implements Runnable {
     
     private Map map;
@@ -35,6 +38,14 @@ public class Rewards implements Runnable {
         }
     }
 
+    public static double round(double value, int places) {
+        if (places < 0) throw new IllegalArgumentException();
+
+        BigDecimal bd = BigDecimal.valueOf(value);
+        bd = bd.setScale(places, RoundingMode.HALF_UP);
+        return bd.doubleValue();
+    }
+
     public void createAllRewards(Location locB)
     {
         int i,j;
@@ -47,7 +58,7 @@ public class Rewards implements Runnable {
                 // apenas cria reward se a localização tiver scooters livres
                 if(locA!=locB && locA.getFreeScooters()>1)
                 {
-                    Double priceReward = (locA.getFreeScooters() * 0.6 + locA.distance(locB) * 0.4)/2;
+                    Double priceReward = round(((locA.getFreeScooters() * 0.6 + locA.distance(locB) * 0.4)/2),2);
                     locA.addReward(new Reward(locB, priceReward));
                 }
             }

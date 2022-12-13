@@ -100,16 +100,19 @@ public class Location {
         this.rewards.put(r.b,r);
     }
 
-    public String rewardsToString(HashMap<Location,Reward> r){
+    public String rewardsToString(Location f){
+
         try {
             l.readLock().lock();
-            if(r==null) return "There's no rewards around your area!";
+            if(this.getRewards()==null) return "There's no rewards around your area!";
             String s = "";
-            for (Location l : r.keySet()) {
-                s += "Location " + "(" + l.getX() + "," + l.getY() + "): " + r.get(l).getReward() + "\n";
+            for (Location l : this.getRewards().keySet()) {
+                s += "(" + l.x + "," + l.y + ") - " + f.toString() + ": " + this.getRewards().get(l).getReward() + "€ \n";
             }
             return s;
         }finally {l.readLock().unlock();}
 
     }
+
+
 }
