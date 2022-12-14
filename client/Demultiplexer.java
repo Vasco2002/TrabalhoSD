@@ -33,12 +33,20 @@ public class Demultiplexer {
                     Frame frame = tc.receive();
                     l.lock();
                     try {
-                        FrameValue fv = map.get(frame.tag);
+                        int tag = frame.tag;
+                        FrameValue fv = map.get(tag);
                         if (fv == null) {
                             fv = new FrameValue();
                             map.put(frame.tag, fv);
                         }
-                        fv.queue.add(frame.data);
+                        if(tag == 4 || tag == 5){
+                            fv.queue.add(frame.rewardList.toString().getBytes());
+                        }
+                        else if(tag == 1){
+                            fv.queue.add(frame.locationList.toString().getBytes());
+                        }
+                        else
+                            fv.queue.add(frame.data);
                         fv.c.signal();
                         // if one thread gets exception, wake up all
                         if (exception != null) 

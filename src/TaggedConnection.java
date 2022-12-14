@@ -26,13 +26,23 @@ public class TaggedConnection implements AutoCloseable {
     public void send(Frame frame) throws IOException {
         try {
             wl.lock();
-            this.dos.writeInt(frame.tag);
-            this.dos.writeUTF(frame.username);
-            this.dos.writeInt(frame.x);
-            this.dos.writeInt(frame.y);
-            this.dos.writeInt(frame.r);
-            this.dos.writeInt(frame.data.length);
-            this.dos.write(frame.data);
+            int tag = frame.tag;
+            this.dos.writeInt(tag);
+            if(tag == 4 || tag == 5){
+                frame.rewardList.serialize(dos);
+            }
+            else if(tag == 1){
+                frame.locationList.serialize(dos);
+            }
+            else {
+                this.dos.writeUTF(frame.username);
+                this.dos.writeInt(frame.x);
+                this.dos.writeInt(frame.y);
+                this.dos.writeInt(frame.r);
+                this.dos.writeInt(frame.data.length);
+                this.dos.write(frame.data);
+            }
+
             this.dos.flush();
         }
         finally {
@@ -42,6 +52,14 @@ public class TaggedConnection implements AutoCloseable {
 
     public void send(int tag, String username,int x, int y, int r, byte[] data) throws IOException {
         this.send(new Frame(tag, username, x, y , r, data));
+    }
+
+    public void send(int tag, RewardList rewardList) throws IOException {
+        this.send(new Frame(tag, rewardList));
+    }
+
+    public void send(int tag, LocationList locationList) throws IOException {
+        this.send(new Frame(tag, locationList));
     }
 
     public Frame receive() throws IOException {

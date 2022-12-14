@@ -110,8 +110,8 @@ class ServerWorker implements Runnable
                     case 1:
                         // List locations with close free scooters
                         pos = map.getMap()[frame.x][frame.y];
-                        List<Location> result = map.locationsFreeScooters(frame.r, pos);
-                        c.send(1,"",0,0,0,result.toString().getBytes());
+                        LocationList result = map.locationsFreeScooters(frame.r, pos);
+                        c.send(1, result);
                         break;
                     case 2:
                         // Reservation
@@ -139,12 +139,12 @@ class ServerWorker implements Runnable
                     case 4:
                         // There are close rewards
                         pos = map.getMap()[frame.x][frame.y];
-                        c.send(4,"",0,0,0,this.map.showSomeRewards(pos,frame.r).getBytes());
+                        c.send(4, this.map.showSomeRewards(pos,frame.r));
                         break;
                         
                     case 5:
                         // List rewards
-                        c.send(5,"",0,0,0,map.showAllRewards().getBytes());
+                        c.send(5,map.showAllRewards2());
                         System.out.println(this.map.printMapRewards());
                         break;
                             

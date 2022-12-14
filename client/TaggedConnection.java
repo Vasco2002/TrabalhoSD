@@ -44,7 +44,10 @@ public class TaggedConnection implements AutoCloseable {
         this.send(new Frame(tag, username, x, y , r, data));
     }
 
+
+
     public Frame receive() throws IOException {
+
         int tag;
         String username;
         int x, y, r;
@@ -52,19 +55,33 @@ public class TaggedConnection implements AutoCloseable {
         try {
             rl.lock();
             tag = this.dis.readInt();
-            username = this.dis.readUTF();
-            x = this.dis.readInt();
-            y = this.dis.readInt();
-            r = this.dis.readInt();
-            int n = this.dis.readInt();
-            data = new byte[n];
-            this.dis.readFully(data);
+            if(tag == 4 || tag == 5){
+                RewardList rewardList = RewardList.deserialize(dis);
+                return new Frame(tag, rewardList);
+            }
+            else if(tag == 1){
+                LocationList locationList = LocationList.deserialize(dis);
+                return new Frame(tag, locationList);
+            }
+            else {
+                username = this.dis.readUTF();
+                x = this.dis.readInt();
+                y = this.dis.readInt();
+                r = this.dis.readInt();
+                int n = this.dis.readInt();
+                data = new byte[n];
+                this.dis.readFully(data);
+                return new Frame(tag, username, x, y , r, data);
+            }
+
         }
         finally {
             rl.unlock();
         }
-        return new Frame(tag, username, x, y , r, data);
+
     }
+
+
 
     @Override
     public void close() throws IOException {

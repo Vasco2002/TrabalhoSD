@@ -9,6 +9,10 @@ public class Frame {
     public final int r;
     public final byte[] data;
 
+    public final RewardList rewardList;
+
+    public final LocationList locationList;
+
     /**
      * Creates a <code>Frame</code> containing the specified information.
      * @param tag this frame's type.
@@ -25,5 +29,31 @@ public class Frame {
         this.y = y;
         this.r = r;
         this.data = data;
+        this.rewardList = null;
+        this.locationList = null;
+    }
+
+    public Frame(int tag, RewardList rewardList) {
+        this.tag = tag;
+        this.rewardList = rewardList;
+        this.username = "";
+        this.x = 0;
+        this.y = 0;
+        this.r = 0;
+        this.data = null;
+        this.locationList = null;
+
+    }
+
+    public Frame(int tag, LocationList locationList) {
+        this.tag = tag;
+        this.rewardList = null;
+        this.username = "";
+        this.x = 0;
+        this.y = 0;
+        this.r = 0;
+        this.data = null;
+        this.locationList = locationList;
+
     }
 }

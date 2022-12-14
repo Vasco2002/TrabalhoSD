@@ -53,7 +53,7 @@ public class Location {
 
     public String toString() 
     {
-        return String.format("(%d,%d)",this.x,this.y);
+        return String.format("Coords: (%d,%d) Quantity: %d",this.x,this.y, this.freeScooters);
     }
 
     public Location clone() { return new Location(this); }

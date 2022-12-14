@@ -12,6 +12,7 @@ import  src.*;
  * Multiple instances of this class can run at the same time.
  */
 public class Client {
+
     public static void main(String[] args) throws Exception 
     {
         Socket s = new Socket("localhost",5555);

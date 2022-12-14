@@ -59,7 +59,7 @@ public class Rewards implements Runnable {
                 if(locA!=locB && locA.getFreeScooters()>1)
                 {
                     Double priceReward = round(((locA.getFreeScooters() * 0.6 + locA.distance(locB) * 0.4)/2),2);
-                    locA.addReward(new Reward(locB, priceReward));
+                    locA.addReward(new Reward(locA,locB, priceReward));
                 }
             }
     }

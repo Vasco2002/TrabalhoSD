@@ -163,9 +163,9 @@ public class Map {
     }
 
     //Returns a list with all the locations with free scotters, in a distance
-    public List<Location> locationsFreeScooters(Integer d, Location location) 
+    public LocationList locationsFreeScooters(Integer d, Location location)
     {
-        List<Location> withFreeScooters = new ArrayList<>();
+        LocationList withFreeScooters = new LocationList();
 
         for (int i=0; i<n; i++)
         {
@@ -179,7 +179,6 @@ public class Map {
 
         return withFreeScooters;
     }
-
 
     public String showAllRewards()
     {
@@ -200,11 +199,33 @@ public class Map {
         } finally {rewardsL.unlock();}
     }
 
-    public String showSomeRewards(Location l, int D)
+
+
+    public RewardList showAllRewards2()
+    {
+        try{
+            rewardsL.lock();
+            RewardList result = new RewardList();
+            int i,j;
+            for (i=0; i<n; i++)
+                for (j=0; j<n; j++) {
+                    if(this.map[i][j].getRewards()!=null)
+                    {
+                        for (Reward  r: this.map[i][j].getRewards().values())
+                            result.add(r);
+                    }
+                }
+
+            return result;
+        } finally {rewardsL.unlock();}
+    }
+
+    public RewardList showSomeRewards(Location l, int D)
     {
         try{
             this.rewardsL.lock();
-            String result = "";
+            RewardList rlist = new RewardList();
+
             int i,j;
 
             int initX = l.getX()-D;
@@ -222,9 +243,11 @@ public class Map {
             for (i=initX; i<=endX; i++)
                 for (j=initY; j<=endY; j++)
                     if(map[i][j].getRewards()!=null && map[i][j].distance(l)<=2)
-                        result += map[i][j].rewardsToString(map[i][j]) + "\n";
+                        for(Reward r : map[i][j].getRewards().values()){
+                            rlist.add(r);
+                        }
 
-            return result;
+            return rlist;
         } finally {rewardsL.unlock();}
     }
 
