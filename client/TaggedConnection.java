@@ -59,6 +59,10 @@ public class TaggedConnection implements AutoCloseable {
                 RewardList rewardList = RewardList.deserialize(dis);
                 return new Frame(tag, rewardList);
             }
+            else if(tag == 2 || tag == 3){
+                double reserv = this.dis.readDouble();
+                return new Frame(tag, reserv);
+            }
             else if(tag == 1){
                 LocationList locationList = LocationList.deserialize(dis);
                 return new Frame(tag, locationList);

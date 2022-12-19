@@ -31,6 +31,9 @@ public class TaggedConnection implements AutoCloseable {
             if(tag == 4 || tag == 5){
                 frame.rewardList.serialize(dos);
             }
+            else if(tag == 2 || tag == 3){
+                this.dos.writeDouble(frame.reserv);
+            }
             else if(tag == 1){
                 frame.locationList.serialize(dos);
             }
@@ -60,6 +63,10 @@ public class TaggedConnection implements AutoCloseable {
 
     public void send(int tag, LocationList locationList) throws IOException {
         this.send(new Frame(tag, locationList));
+    }
+
+    public void send(int tag, double reserv) throws IOException {
+        this.send(new Frame(tag, reserv));
     }
 
     public Frame receive() throws IOException {

@@ -13,6 +13,10 @@ public class Frame {
 
     public final LocationList locationList;
 
+    public final double reserv;
+
+
+
     /**
      * Creates a <code>Frame</code> containing the specified information.
      * @param tag this frame's type.
@@ -31,6 +35,7 @@ public class Frame {
         this.data = data;
         this.rewardList = null;
         this.locationList = null;
+        this.reserv = 0;
     }
 
     public Frame(int tag, RewardList rewardList) {
@@ -42,6 +47,7 @@ public class Frame {
         this.r = 0;
         this.data = null;
         this.locationList = null;
+        this.reserv = 0;
 
     }
 
@@ -54,6 +60,20 @@ public class Frame {
         this.r = 0;
         this.data = null;
         this.locationList = locationList;
+        this.reserv = 0;
+
+    }
+
+    public Frame(int tag, double reserv) {
+        this.tag = tag;
+        this.rewardList = null;
+        this.username = "";
+        this.x = 0;
+        this.y = 0;
+        this.r = 0;
+        this.data = null;
+        this.locationList = null;
+        this.reserv = reserv;
 
     }
 }

@@ -90,31 +90,30 @@ public class Map {
             // verify if the user does not have reservations and if there are free scooters in that location
             System.out.println("Free scooters: " + location.getFreeScooters());
 
-            if(user.getReserv() == null) {
-                if (location.getFreeScooters() > 0) {
-                    //decreases the number of free scooters in the location
-                    location.removeScotter();
 
-                    //associate revervation to user
-                    user.setReserv(new Reservation(this.reservationCode, location, LocalDateTime.now()));
+            if (location.getFreeScooters() > 0) {
+                //decreases the number of free scooters in the location
+                location.removeScotter();
 
-                    //increases the number of global reservations done
-                    lCounter.lock();
-                    this.reservationCode++;
-                    lCounter.unlock();
+                //associate revervation to user
+                user.setReserv(new Reservation(this.reservationCode, location, LocalDateTime.now()));
 
-                    // was done a reservation, the rewards have to be recalculated
-                    rewardsL.lock();
-                    this.aReward = true;
-                    c.signalAll();
-                    rewardsL.unlock();
+                //increases the number of global reservations done
+                lCounter.lock();
+                this.reservationCode++;
+                lCounter.unlock();
 
-                    return 0;
-                }
-                else return 1;
+                // was done a reservation, the rewards have to be recalculated
+                rewardsL.lock();
+                this.aReward = true;
+                c.signalAll();
+                rewardsL.unlock();
 
+                return 1;
             }
-            else return  -1;
+            else return 0;
+
+
         } finally {
             user.l.unlock();
         }
@@ -158,7 +157,7 @@ public class Map {
         rewardsL.unlock();
 
         user.l.unlock();
-
+        System.out.println("Price:" + price);
         return price;
     }
 

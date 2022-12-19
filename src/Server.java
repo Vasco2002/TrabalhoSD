@@ -116,24 +116,13 @@ class ServerWorker implements Runnable
                     case 2:
                         // Reservation
                         pos = map.getMap()[frame.x][frame.y];
-                        int r = map.makeReservation(users.get(frame.username), pos);
-                        if(r == 1)
-                            c.send(2,"",0,0,0,"No scooters in this location!".getBytes());
-                        else if (r==0)
-                            c.send(2,"",0,0,0,"Reservation done successfully!".getBytes());
-                        else
-                            c.send(2,"",0,0,0,"You already have a reservation!".getBytes());
+                        c.send(2,map.makeReservation(users.get(frame.username), pos));
                         System.out.println(map.printMap());
                         break;
                     case 3:
                         // Parking
-                        double price;
                         pos = map.getMap()[frame.x][frame.y];
-                        if (users.get(frame.username).getReserv()!=null) {
-                            price = map.parkScooter(users.get(frame.username), pos);
-                            String s = "Parking done successfully!\n" + "Trip cost: " + price;
-                            c.send(3, "", 0, 0, 0, s.getBytes());
-                        } else c.send(3, "", 0, 0, 0, "You don't have reservation!".getBytes());
+                        c.send(3,  map.parkScooter(users.get(frame.username), pos));
                         System.out.println(map.printMap());
                         break;
                     case 4:
@@ -146,6 +135,13 @@ class ServerWorker implements Runnable
                         // List rewards
                         c.send(5,map.showAllRewards2());
                         System.out.println(this.map.printMapRewards());
+                        break;
+
+                    case 8:
+                        pos = map.getMap()[frame.x][frame.y];
+                        Socket socketNotif = new Socket("localhost", 55555);
+                        TaggedConnection cN = new TaggedConnection(socketNotif);
+                        //cN.send();
                         break;
                             
                     

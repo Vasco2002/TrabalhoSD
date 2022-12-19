@@ -42,6 +42,9 @@ public class Demultiplexer {
                         if(tag == 4 || tag == 5){
                             fv.queue.add(frame.rewardList.toString().getBytes());
                         }
+                        else if(tag == 2 || tag == 3){
+                            fv.queue.add(String.valueOf(frame.reserv).getBytes());
+                        }
                         else if(tag == 1){
                             fv.queue.add(frame.locationList.toString().getBytes());
                         }

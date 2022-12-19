@@ -58,9 +58,9 @@ public class Reward {
 
     public String toString(){
         StringBuilder sb = new StringBuilder();
-        sb.append("Origem: (").append(this.a.x).append(",").append(this.a.y).append(")")
-                .append(" Destino: (").append(this.b.x).append(",").append(this.b.y).append(")")
-                .append(" Valor: ").append(this.reward).append(" €");
+        sb.append("(").append(this.b.x).append(",").append(this.b.y).append(")")
+                .append("-(").append(this.a.x).append(",").append(this.a.y).append(")")
+                .append(": ").append(this.reward).append(" €");
 
         return sb.toString();
     }
