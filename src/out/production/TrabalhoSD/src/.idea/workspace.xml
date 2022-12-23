@@ -1,40 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
   <component name="ChangeListManager">
     <list default="true" id="baceccc8-a409-42e8-a5a8-9230d3a5094a" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/../client/Location.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../client/LocationList.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../client/Reward.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../client/RewardList.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/LocationList.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/RewardList.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../client/Notification.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../client/Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/../client/Client.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../client/Demultiplexer.java" beforeDir="false" afterPath="$PROJECT_DIR$/../client/Demultiplexer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../client/Frame.java" beforeDir="false" afterPath="$PROJECT_DIR$/../client/Frame.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../client/TaggedConnection.java" beforeDir="false" afterPath="$PROJECT_DIR$/../client/TaggedConnection.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../client/out/production/client/src/Client.class" beforeDir="false" afterPath="$PROJECT_DIR$/../client/out/production/client/src/Client.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../client/out/production/client/src/Demultiplexer.class" beforeDir="false" afterPath="$PROJECT_DIR$/../client/out/production/client/src/Demultiplexer.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../client/out/production/client/src/Frame.class" beforeDir="false" afterPath="$PROJECT_DIR$/../client/out/production/client/src/Frame.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../client/out/production/client/src/TaggedConnection.class" beforeDir="false" afterPath="$PROJECT_DIR$/../client/out/production/client/src/TaggedConnection.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Demultiplexer.java" beforeDir="false" afterPath="$PROJECT_DIR$/Demultiplexer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Frame.java" beforeDir="false" afterPath="$PROJECT_DIR$/Frame.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Location.java" beforeDir="false" afterPath="$PROJECT_DIR$/Location.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Map.java" beforeDir="false" afterPath="$PROJECT_DIR$/Map.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Reward.java" beforeDir="false" afterPath="$PROJECT_DIR$/Reward.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Notifications.java" beforeDir="false" afterPath="$PROJECT_DIR$/Notifications.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Rewards.java" beforeDir="false" afterPath="$PROJECT_DIR$/Rewards.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Server.java" beforeDir="false" afterPath="$PROJECT_DIR$/Server.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/TaggedConnection.java" beforeDir="false" afterPath="$PROJECT_DIR$/TaggedConnection.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/TrabalhoSD/src/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/TrabalhoSD/src/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/TrabalhoSD/src/Demultiplexer.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/TrabalhoSD/src/Demultiplexer.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/TrabalhoSD/src/Frame.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/TrabalhoSD/src/Frame.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/TrabalhoSD/src/Location.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/TrabalhoSD/src/Location.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/TrabalhoSD/src/Map.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/TrabalhoSD/src/Map.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/TrabalhoSD/src/Reward.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/TrabalhoSD/src/Reward.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/TrabalhoSD/src/Rewards.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/TrabalhoSD/src/Rewards.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/User.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/TrabalhoSD/src/Server.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/TrabalhoSD/src/Server.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/TrabalhoSD/src/ServerWorker.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/TrabalhoSD/src/ServerWorker.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/TrabalhoSD/src/TaggedConnection.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/TrabalhoSD/src/TaggedConnection.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -64,7 +49,7 @@
   &quot;keyToString&quot;: {
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/ritavaz02/Documents/uni/sd/TrabalhoSD/client&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/ritavaz02/Documents/uni/sd/TrabalhoSD/src&quot;,
     &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
     &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
     &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;

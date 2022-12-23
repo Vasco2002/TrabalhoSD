@@ -39,7 +39,7 @@ public class Demultiplexer {
                             fv = new FrameValue();
                             map.put(frame.tag, fv);
                         }
-                        if(tag == 4 || tag == 5){
+                        if(tag == 4 || tag == 5 || tag == 9){
                             fv.queue.add(frame.rewardList.toString().getBytes());
                         }
                         else if(tag == 2 || tag == 3){

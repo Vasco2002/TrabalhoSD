@@ -28,7 +28,7 @@ public class TaggedConnection implements AutoCloseable {
             wl.lock();
             int tag = frame.tag;
             this.dos.writeInt(tag);
-            if(tag == 4 || tag == 5){
+            if(tag == 4 || tag == 5 || tag == 9){
                 frame.rewardList.serialize(dos);
             }
             else if(tag == 2 || tag == 3){

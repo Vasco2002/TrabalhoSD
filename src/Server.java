@@ -8,61 +8,37 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
 class ServerWorker implements Runnable 
 {
+    Map map;
+    HashMap<String,User> users;
     private Socket socket;
-    private HashMap<String,User> users = new HashMap<>();
     public ReentrantReadWriteLock l = new ReentrantReadWriteLock();
-    private Map map;
 
-    public ServerWorker (Socket socket, Integer NMap, String fileUsers) {
 
-        // create map
-        map = new Map(NMap);
-        
-        // Get the users
-        File f = new File(fileUsers);
-        if(f.exists())
-            this.parserUser(fileUsers);
-
+    public ServerWorker (Socket socket, Map a, HashMap<String,User> u) {
         this.socket = socket;
-
-        Thread rewards = new Thread(new Rewards(map));
-        rewards.start();
-
-    }
-
-    public List<String> readFile(String nomeFich) {
-        List<String> lines;
-        try { lines = Files.readAllLines(Paths.get(nomeFich), StandardCharsets.UTF_8);}
-        catch(IOException exc) {
-            lines = new ArrayList<>();
-        }
-        return lines;
-    }
-
-    public void parserUser (String fileUsers) {
-        List<String> linhas = readFile(fileUsers);
-        String[] parts;
-        for (String linha : linhas) {
-            parts = linha.split(";");
-            this.users.put(parts[0],new User(parts[1]));
-        }
+        this.map = a;
+        this.users = u;
     }
 
     @Override
     public void run() 
     {
-        String email;
+        String email = "";
         String password;
         Location pos;
+
         System.out.println(map.printMap());
         try (TaggedConnection c = new TaggedConnection(this.socket)) 
         {
+
             while (true)
             {
                 Frame frame = c.receive();
@@ -90,6 +66,7 @@ class ServerWorker implements Runnable
                             else c.send(6, "",0,0,0, "Error - Wrong Password.".getBytes());
                         } else
                             c.send(6, "",0,0,0, "Error - Account doesn't exist.".getBytes());
+                        users.get(email).setTaggedConnection(c);
                         break;
                     case 7:
                         // User registration
@@ -106,6 +83,7 @@ class ServerWorker implements Runnable
                         } finally {
                             l.writeLock().unlock();
                         }
+                        users.get(email).setTaggedConnection(c);
                         break;
                     case 1:
                         // List locations with close free scooters
@@ -116,12 +94,14 @@ class ServerWorker implements Runnable
                     case 2:
                         // Reservation
                         pos = map.getMap()[frame.x][frame.y];
+                        this.users.get(email).setPos(pos);
                         c.send(2,map.makeReservation(users.get(frame.username), pos));
                         System.out.println(map.printMap());
                         break;
                     case 3:
                         // Parking
                         pos = map.getMap()[frame.x][frame.y];
+                        this.users.get(email).setPos(pos);
                         c.send(3,  map.parkScooter(users.get(frame.username), pos));
                         System.out.println(map.printMap());
                         break;
@@ -138,10 +118,19 @@ class ServerWorker implements Runnable
                         break;
 
                     case 8:
+                        // active notifications
+                        // recebe posição onde o cliente pretende receber se existem notificações perto
                         pos = map.getMap()[frame.x][frame.y];
-                        Socket socketNotif = new Socket("localhost", 55555);
-                        TaggedConnection cN = new TaggedConnection(socketNotif);
-                        //cN.send();
+                        this.users.get(email).setPos(pos);
+                        // tem de haver uma thread que fique a percorrer as localizações que precisam
+                        if(this.users.get(email).getWantNotification()){
+                            // quer desativar notificação
+                            this.users.get(email).setWantNotification(false);
+                        }
+                        else{
+                            // quer ativar -> adiciona o user na lista de notificações da posição
+                            this.users.get(email).setWantNotification(true);
+                        }
                         break;
                             
                     
@@ -166,17 +155,56 @@ public class Server {
     // args[0] = server tcp port
     // args[1] = mapa
     // args[2] = users
+
+    private static HashMap<String,User> users = new HashMap<>();
+
+    private static Map map;
+
+    public static void parserUser (String fileUsers) {
+        List<String> linhas = readFile(fileUsers);
+        String[] parts;
+        for (String linha : linhas) {
+            parts = linha.split(";");
+            users.put(parts[0],new User(parts[1]));
+        }
+    }
+
+    public static List<String> readFile(String nomeFich) {
+        List<String> lines;
+        try { lines = Files.readAllLines(Paths.get(nomeFich), StandardCharsets.UTF_8);}
+        catch(IOException exc) {
+            lines = new ArrayList<>();
+        }
+        return lines;
+    }
     
     public static void main(String[] args) throws Exception 
     {
         ServerSocket serverSocket = new ServerSocket(Integer.parseInt(args[0]));
         /* Every time a new Client tries to connect, accept that connection, run a worker to handle the client and go back to waiting for new clients. */
-        while(true) 
+
+        // create map
+        Map map = new Map(Integer.parseInt(args[1]));
+
+        // Get the users
+        File f = new File(args[2]);
+        if(f.exists())
+            parserUser(args[2]);
+
+        Thread rewards = new Thread(new Rewards(map));
+        rewards.start();
+
+        Thread notification = new Thread(new Notifications(map,users));
+        notification.start();
+
+        while(true)
         {
             Socket socket = serverSocket.accept();
-            Thread worker = new Thread(new ServerWorker(socket, Integer.parseInt(args[1]), args[2]));
+            Thread worker = new Thread(new ServerWorker(socket, map, users));
             worker.start();
         }
     }
+
+
 
 }

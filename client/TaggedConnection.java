@@ -55,7 +55,7 @@ public class TaggedConnection implements AutoCloseable {
         try {
             rl.lock();
             tag = this.dis.readInt();
-            if(tag == 4 || tag == 5){
+            if(tag == 4 || tag == 5 || tag == 9){
                 RewardList rewardList = RewardList.deserialize(dis);
                 return new Frame(tag, rewardList);
             }

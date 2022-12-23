@@ -19,12 +19,16 @@ public class Client {
     {
         Socket s = new Socket("localhost",5555);
         Demultiplexer m = new Demultiplexer(new TaggedConnection(s));
-
         m.start();
 
         BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
 
         String username = null;
+
+        Boolean wantNotific = false;
+
+        Thread notification = new Thread(new Notification(m));
+        notification.start();
 
         while (username == null) {
             System.out.print("**** Welcome to scooters app! ****\n"
@@ -77,6 +81,7 @@ public class Client {
                     + "3) Park scooter.\n"
                     + "4) Search close rewards.\n"
                     + "5) Show all rewards.\n"
+                    + "6) Active/Desactive notifications. \n"
                     + "0) Exit.\n"
                     + "\n"
                     + "Enter the correspondent value: ");
@@ -101,9 +106,9 @@ public class Client {
                     System.out.println("\n" + response + "\n");
                     break;
                 case "2":
-                    if(hasReserv)
+                    if (hasReserv)
                         System.out.println("You already have a reservation!");
-                    else{
+                    else {
                         System.out.println("Enter your current location:\n"
                                 + "x: ");
                         x = Integer.parseInt(stdin.readLine());
@@ -111,16 +116,16 @@ public class Client {
                         y = Integer.parseInt(stdin.readLine());
                         m.send(2, username, x, y, 0, "".getBytes());
                         response = new String(m.receive(2));
-                        if(Double.parseDouble(response) == 0){
+                        if (Double.parseDouble(response) == 0) {
                             System.out.println("There are no scooters at this location!");
-                        }else{
+                        } else {
                             System.out.println("Reservation done successfully!");
                             hasReserv = true;
                         }
                     }
                     break;
                 case "3":
-                    if(!hasReserv)
+                    if (!hasReserv)
                         System.out.println("You don't have a reservation!");
                     else {
                         System.out.println("Enter the location which you want to park the scooter:\n"
@@ -132,7 +137,7 @@ public class Client {
                         response = new String(m.receive(3));
                         Double responseD = Double.parseDouble(response);
                         DecimalFormat df = new DecimalFormat("0.00");
-                        if(responseD < 0){
+                        if (responseD < 0) {
                             System.out.println("Here's the cost of the trip: " + df.format(Math.abs(responseD)) + "€");
 
 
@@ -159,16 +164,24 @@ public class Client {
                     response = new String(m.receive(5));
                     System.out.println("\n" + response + "\n");
                     break;
-                case "8":
-                    System.out.println("Enter your current location:\n"
-                            + "x: ");
-                    x = Integer.parseInt(stdin.readLine());
-                    System.out.println("y: ");
-                    y = Integer.parseInt(stdin.readLine());
-                    m.send(8, username, x, y, 0, "".getBytes());
-
-
-
+                case "6":
+                    if (wantNotific)
+                    {
+                        // quer desativar notificação
+                        wantNotific = false;
+                        m.send(8, username, 0, 0, 0, "".getBytes());
+                        System.out.println("Desativou notificações!");
+                    }
+                    else {
+                        System.out.println("Enter your current location:\n"
+                                + "x: ");
+                        x = Integer.parseInt(stdin.readLine());
+                        System.out.println("y: ");
+                        y = Integer.parseInt(stdin.readLine());
+                        m.send(8, username, x, y, 0, "".getBytes());
+                        wantNotific = true;
+                        System.out.println("Ativou notificações!");
+                    }
             }
         }
 

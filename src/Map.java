@@ -19,8 +19,10 @@ public class Map {
     public ReentrantLock lCounter = new ReentrantLock();
 
     public ReentrantLock rewardsL = new ReentrantLock();
+    public ReentrantLock notifL = new ReentrantLock();
     public Condition c = rewardsL.newCondition();
 
+    public Condition cNot = notifL.newCondition();
     boolean aReward = false;
 
 
@@ -88,8 +90,6 @@ public class Map {
         try {
             user.l.lock();
             // verify if the user does not have reservations and if there are free scooters in that location
-            System.out.println("Free scooters: " + location.getFreeScooters());
-
 
             if (location.getFreeScooters() > 0) {
                 //decreases the number of free scooters in the location
@@ -105,8 +105,11 @@ public class Map {
 
                 // was done a reservation, the rewards have to be recalculated
                 rewardsL.lock();
+                notifL.lock();
                 this.aReward = true;
                 c.signalAll();
+                cNot.signalAll();
+                notifL.unlock();
                 rewardsL.unlock();
 
                 return 1;
@@ -126,9 +129,6 @@ public class Map {
         double price = 0;
         user.l.lock();
 
-        System.out.println("User: " + user.getPassword());
-
-
         // retira da localização anterior e adiciona na presente
         // decrease number of free scooters in
 
@@ -140,7 +140,6 @@ public class Map {
 
         // confirm if the deslocation has reward
         if(prev.getRewards() != null && prev.getRewards().containsKey(location)){
-            System.out.println(prev.getRewards().get(location));
             price = prev.getRewards().get(location).getReward();}
 
         else price = -(0.7 * prev.distance(location) + 0.3 * ChronoUnit.MINUTES.between(user.getReserv().getReservationDate(), LocalDateTime.now())) / 4;
@@ -152,12 +151,14 @@ public class Map {
 
         // was done a parking, the rewards have to be recalculated
         rewardsL.lock();
+        notifL.lock();
         this.aReward = true;
         c.signalAll();
+        cNot.signalAll();
+        notifL.unlock();
         rewardsL.unlock();
 
         user.l.unlock();
-        System.out.println("Price:" + price);
         return price;
     }
 
@@ -188,10 +189,7 @@ public class Map {
             for (i=0; i<n; i++)
                 for (j=0; j<n; j++) {
                     if(map[i][j].getRewards()!=null)
-                    {
                         result += map[i][j].rewardsToString(map[i][j]) + "\n";
-                        //System.out.println("(" + i + "," + j + "): " + map[i][j].getRewards());
-                    }
                 }
 
             return result;

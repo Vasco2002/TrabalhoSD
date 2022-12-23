@@ -33,7 +33,7 @@ public class Rewards implements Runnable {
             {
                 Location locB = map.getMap()[i][j];
                 if(map.locationsFreeScooters(D,locB).size()==0)
-                    this.createAllRewards(locB);
+                    this.createAllRewards(locB,"");
             }
         }
     }
@@ -46,22 +46,23 @@ public class Rewards implements Runnable {
         return bd.doubleValue();
     }
 
-    public void createAllRewards(Location locB)
+    public RewardList createAllRewards(Location locB, String user)
     {
         int i,j;
         int n = map.getN();
+        RewardList l = null;
 
         for (i=0; i<n; i++)
             for (j=0; j<n; j++)
             {
                 Location locA = map.getMap()[i][j];
                 // apenas cria reward se a localização tiver scooters livres
-                if(locA!=locB && locA.getFreeScooters()>1)
-                {
-                    Double priceReward = round(((locA.getFreeScooters() * 0.6 + locA.distance(locB) * 0.4)/2),2);
-                    locA.addReward(new Reward(locA,locB, priceReward));
+                if(locA!=locB && locA.getFreeScooters()>1) {
+                    Double priceReward = round(((locA.getFreeScooters() * 0.6 + locA.distance(locB) * 0.4) / 2), 2);
+                    locA.addReward(new Reward(locA, locB, priceReward));
                 }
             }
+        return l;
     }
 
     public void run() 

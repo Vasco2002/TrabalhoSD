@@ -26,10 +26,10 @@ public class RewardList extends ArrayList<Reward> {
     }
 
     public String toString(){
+
         if(this.size() == 0) {
             return "There are no rewards available near the location provided!";
         }
-
         StringBuilder sb = new StringBuilder();
         for(Reward r : this){
             sb.append(r.toString()).append("\n");
