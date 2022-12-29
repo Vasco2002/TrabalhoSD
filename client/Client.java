@@ -70,7 +70,7 @@ public class Client {
         }
 
         boolean exit = false;
-        boolean hasReserv = false;
+        int hasReserv = -1;
 
         while (!exit) {
             System.out.print("\n***Welcome to scooters app!***\n"
@@ -91,6 +91,9 @@ public class Client {
             String response;
             switch(option) {
                 case "0":
+                    m.send(0, "", 0, 0, 0, "".getBytes());
+                    m.receive(0);
+                    s.shutdownInput();
                     exit = true;
                     break;
                 case "1":
@@ -106,7 +109,7 @@ public class Client {
                     System.out.println("\n" + response + "\n");
                     break;
                 case "2":
-                    if (hasReserv)
+                    if (hasReserv >= 0)
                         System.out.println("You already have a reservation!");
                     else {
                         System.out.println("Enter your current location:\n"
@@ -116,35 +119,40 @@ public class Client {
                         y = Integer.parseInt(stdin.readLine());
                         m.send(2, username, x, y, 0, "".getBytes());
                         response = new String(m.receive(2));
-                        if (Double.parseDouble(response) == 0) {
-                            System.out.println("There are no scooters at this location!");
-                        } else {
-                            System.out.println("Reservation done successfully!");
-                            hasReserv = true;
+                        if(!response.equals("There are no scooters near this location!")){
+                            String[] out = response.split(" ");
+                            hasReserv = Integer.parseInt(out[1]);
                         }
+                        System.out.println("\n" + response + "\n");
                     }
                     break;
                 case "3":
-                    if (!hasReserv)
+                    if (hasReserv == -1)
                         System.out.println("You don't have a reservation!");
-                    else {
-                        System.out.println("Enter the location which you want to park the scooter:\n"
-                                + "x: ");
-                        x = Integer.parseInt(stdin.readLine());
-                        System.out.println("y: ");
-                        y = Integer.parseInt(stdin.readLine());
-                        m.send(3, username, x, y, 0, "".getBytes());
-                        response = new String(m.receive(3));
-                        Double responseD = Double.parseDouble(response);
-                        DecimalFormat df = new DecimalFormat("0.00");
-                        if (responseD < 0) {
-                            System.out.println("Here's the cost of the trip: " + df.format(Math.abs(responseD)) + "€");
+                    else{
+                        System.out.println("Enter you Reservation code:");
+                        r = Integer.parseInt(stdin.readLine());
+                        if(r == hasReserv) {
+                            System.out.println("Enter the location which you want to park the scooter:\n"
+                                    + "x: ");
+                            x = Integer.parseInt(stdin.readLine());
+                            System.out.println("y: ");
+                            y = Integer.parseInt(stdin.readLine());
+                            m.send(3, username, x, y, r, "".getBytes());
+                            response = new String(m.receive(3));
+                            Double responseD = Double.parseDouble(response);
+                            DecimalFormat df = new DecimalFormat("0.00");
+                            if (responseD < 0) {
+                                System.out.println("Here's the cost of the trip: " + df.format(Math.abs(responseD)) + "€");
 
 
+                            } else {
+                                System.out.println("Here's your reward: " + df.format(responseD) + "€");
+                            }
+                            hasReserv = -1;
                         } else {
-                            System.out.println("Here's your reward: " + df.format(responseD) + "€");
+                            System.out.println("That's not your reservation code >:(");
                         }
-                        hasReserv = false;
                     }
                     break;
                 case "4":
@@ -170,7 +178,7 @@ public class Client {
                         // quer desativar notificação
                         wantNotific = false;
                         m.send(8, username, 0, 0, 0, "".getBytes());
-                        System.out.println("Desativou notificações!");
+                        System.out.println("Desativou notificações! D:");
                     }
                     else {
                         System.out.println("Enter your current location:\n"
@@ -180,11 +188,13 @@ public class Client {
                         y = Integer.parseInt(stdin.readLine());
                         m.send(8, username, x, y, 0, "".getBytes());
                         wantNotific = true;
-                        System.out.println("Ativou notificações!");
+                        System.out.println("Ativou notificações! ^-^");
                     }
+                    break;
             }
         }
-
         m.close();
+        s.close();
+        System.exit(0);
     }
 }

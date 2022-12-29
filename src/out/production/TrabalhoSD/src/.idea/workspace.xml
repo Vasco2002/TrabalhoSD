@@ -8,6 +8,7 @@
       <change afterPath="$PROJECT_DIR$/../client/Notification.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../client/Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/../client/Client.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../client/Demultiplexer.java" beforeDir="false" afterPath="$PROJECT_DIR$/../client/Demultiplexer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../client/RewardList.java" beforeDir="false" afterPath="$PROJECT_DIR$/../client/RewardList.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../client/TaggedConnection.java" beforeDir="false" afterPath="$PROJECT_DIR$/../client/TaggedConnection.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../client/out/production/client/src/Client.class" beforeDir="false" afterPath="$PROJECT_DIR$/../client/out/production/client/src/Client.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />

@@ -6,7 +6,6 @@ import java.math.RoundingMode;
 public class Rewards implements Runnable {
     
     private Map map;
-    private final int D = 2;
 
     public Rewards(Map map)
     {
@@ -32,7 +31,7 @@ public class Rewards implements Runnable {
             for (j=0; j<n; j++)
             {
                 Location locB = map.getMap()[i][j];
-                if(map.locationsFreeScooters(D,locB).size()==0)
+                if(map.locationsFreeScooters(map.getD(),locB).size()==0)
                     this.createAllRewards(locB,"");
             }
         }

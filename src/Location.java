@@ -39,9 +39,17 @@ public class Location {
         this.rewards = pos.getRewards();
     }
 
-    public int distance(Location l)
+    public int distance(Location location)
     {
-        return Math.abs(l.x - this.x) + Math.abs(l.y - this.y);
+        try {
+            l.readLock().lock();
+            location.l.readLock().lock();
+            return Math.abs(location.x - this.x) + Math.abs(location.y - this.y);
+        }finally {
+            location.l.readLock().unlock();
+            l.readLock().unlock();
+        }
+
     }
 
     public boolean equals(Object o) 

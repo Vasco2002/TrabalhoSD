@@ -4,18 +4,18 @@ import java.time.LocalDateTime;
 
 public class Reservation {
     
-    private Integer code;
+    private int code;
     private Location location;
     private LocalDateTime reservationDate;
 
-    public Reservation(Integer codigo, Location location, LocalDateTime date) 
+    public Reservation(int codigo, Location location, LocalDateTime date)
     {
         this.code = codigo;
         this.location = location;
         this.reservationDate = date;
     }
 
-    public Integer getCode()
+    public int getCode()
     {
         return this.code;
     }

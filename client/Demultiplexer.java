@@ -42,8 +42,14 @@ public class Demultiplexer {
                         if(tag == 4 || tag == 5 || tag == 9){
                             fv.queue.add(frame.rewardList.toString().getBytes());
                         }
-                        else if(tag == 2 || tag == 3){
+                        else if(tag == 3){
                             fv.queue.add(String.valueOf(frame.reserv).getBytes());
+                        }
+                        else if(tag == 2){
+                            String aux;
+                            if(frame.r == -1) aux = "There are no scooters near this location!";
+                            else aux = "Reservation " + frame.r + " done in (" + frame.x + "," + frame.y + ") :)";
+                            fv.queue.add(aux.getBytes());
                         }
                         else if(tag == 1){
                             fv.queue.add(frame.locationList.toString().getBytes());

@@ -38,8 +38,8 @@ class ServerWorker implements Runnable
         System.out.println(map.printMap());
         try (TaggedConnection c = new TaggedConnection(this.socket)) 
         {
-
-            while (true)
+            boolean exit = false;
+            while (!exit)
             {
                 Frame frame = c.receive();
                 switch(frame.tag){
@@ -49,24 +49,23 @@ class ServerWorker implements Runnable
                         email = frame.username;
                         password = new String(frame.data);
                         // Search password of user saved in mem
-                        String stored_password;
+                        String stored_password = null;
                         l.readLock().lock();
                         try {
-                            stored_password = users.get(email).getPassword();
+                            if(users.containsKey(email)) {
+                                stored_password = users.get(email).getPassword();
+                                users.get(email).setTaggedConnection(c);
+
+                                if (stored_password.equals(password))
+                                {
+                                    // passwords match
+                                    c.send(6, "", 0,0,0,"Session started successfully!".getBytes());
+                                } else c.send(6, "",0,0,0, "Error - Wrong Password.".getBytes());
+                            }else c.send(6, "",0,0,0, "Error - Account doesn't exist.".getBytes());
+
                         } finally {
                             l.readLock().unlock();
                         }
-                        if (stored_password != null) 
-                        {
-                            if (stored_password.equals(password)) 
-                            {
-                                // passwords match
-                                c.send(6, "", 0,0,0,"Session started successfully!".getBytes());
-                            }
-                            else c.send(6, "",0,0,0, "Error - Wrong Password.".getBytes());
-                        } else
-                            c.send(6, "",0,0,0, "Error - Account doesn't exist.".getBytes());
-                        users.get(email).setTaggedConnection(c);
                         break;
                     case 7:
                         // User registration
@@ -95,14 +94,17 @@ class ServerWorker implements Runnable
                         // Reservation
                         pos = map.getMap()[frame.x][frame.y];
                         this.users.get(email).setPos(pos);
-                        c.send(2,map.makeReservation(users.get(frame.username), pos));
+                        Location aux = map.makeReservation(users.get(frame.username),pos);
+                        if (aux == null) c.send(2, "", -1,-1,-1,"".getBytes());
+                        else c.send(2, "", aux.getX(),aux.getY(),this.users.get(email).getReserv().getCode(),"".getBytes());
                         System.out.println(map.printMap());
                         break;
                     case 3:
                         // Parking
+                        int reserv = frame.r;
                         pos = map.getMap()[frame.x][frame.y];
                         this.users.get(email).setPos(pos);
-                        c.send(3,  map.parkScooter(users.get(frame.username), pos));
+                        c.send(3, map.parkScooter(users.get(frame.username), pos));
                         System.out.println(map.printMap());
                         break;
                     case 4:
@@ -132,7 +134,11 @@ class ServerWorker implements Runnable
                             this.users.get(email).setWantNotification(true);
                         }
                         break;
-                            
+                    case 0:
+                        c.send(0, "", 0, 0, 0, "".getBytes());
+                        this.users.get(email).setWantNotification(false);
+                        exit = true;
+                        break;
                     
                 }   
                     
@@ -159,24 +165,6 @@ public class Server {
     private static HashMap<String,User> users = new HashMap<>();
 
     private static Map map;
-
-    public static void parserUser (String fileUsers) {
-        List<String> linhas = readFile(fileUsers);
-        String[] parts;
-        for (String linha : linhas) {
-            parts = linha.split(";");
-            users.put(parts[0],new User(parts[1]));
-        }
-    }
-
-    public static List<String> readFile(String nomeFich) {
-        List<String> lines;
-        try { lines = Files.readAllLines(Paths.get(nomeFich), StandardCharsets.UTF_8);}
-        catch(IOException exc) {
-            lines = new ArrayList<>();
-        }
-        return lines;
-    }
     
     public static void main(String[] args) throws Exception 
     {
@@ -185,11 +173,6 @@ public class Server {
 
         // create map
         Map map = new Map(Integer.parseInt(args[1]));
-
-        // Get the users
-        File f = new File(args[2]);
-        if(f.exists())
-            parserUser(args[2]);
 
         Thread rewards = new Thread(new Rewards(map));
         rewards.start();
@@ -204,7 +187,6 @@ public class Server {
             worker.start();
         }
     }
-
 
 
 }

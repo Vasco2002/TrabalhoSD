@@ -5,20 +5,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="baceccc8-a409-42e8-a5a8-9230d3a5094a" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/../client/Notification.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../client/Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/../client/Client.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../client/Demultiplexer.java" beforeDir="false" afterPath="$PROJECT_DIR$/../client/Demultiplexer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../client/RewardList.java" beforeDir="false" afterPath="$PROJECT_DIR$/../client/RewardList.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../client/TaggedConnection.java" beforeDir="false" afterPath="$PROJECT_DIR$/../client/TaggedConnection.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../client/out/production/client/src/Client.class" beforeDir="false" afterPath="$PROJECT_DIR$/../client/out/production/client/src/Client.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Location.java" beforeDir="false" afterPath="$PROJECT_DIR$/Location.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Map.java" beforeDir="false" afterPath="$PROJECT_DIR$/Map.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Notifications.java" beforeDir="false" afterPath="$PROJECT_DIR$/Notifications.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Reservation.java" beforeDir="false" afterPath="$PROJECT_DIR$/Reservation.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Rewards.java" beforeDir="false" afterPath="$PROJECT_DIR$/Rewards.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Server.java" beforeDir="false" afterPath="$PROJECT_DIR$/Server.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/TaggedConnection.java" beforeDir="false" afterPath="$PROJECT_DIR$/TaggedConnection.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/User.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/TrabalhoSD/src/Server.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/TrabalhoSD/src/Server.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/TrabalhoSD/src/ServerWorker.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/TrabalhoSD/src/ServerWorker.class" afterDir="false" />
     </list>
@@ -46,25 +43,43 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/ritavaz02/Documents/uni/sd/TrabalhoSD/src&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "last_opened_file_path": "/home/vasco/Desktop/TrabalhoSD/src",
+    "project.structure.last.edited": "Project",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.0"
   }
-}</component>
-  <component name="RunManager">
-    <configuration name="src.Server" type="Application" factoryName="Application" nameIsGenerated="true">
+}]]></component>
+  <component name="RunManager" selected="Application.src.Server">
+    <configuration name="Server" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="src.Server" />
       <module name="TrabalhoSD" />
-      <option name="PROGRAM_PARAMETERS" value="5555 20 ../in/fileUsers.txt" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="src.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="src.Server" type="Application" factoryName="Application" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="src.Server" />
+      <module name="TrabalhoSD" />
+      <option name="PROGRAM_PARAMETERS" value="5555 20" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.Server" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">

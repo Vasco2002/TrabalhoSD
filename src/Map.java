@@ -15,6 +15,8 @@ public class Map {
 
     private int n; // Number of lines/columns of the map
     private Location[][] map;
+
+    private final int D = 2;
     private Integer reservationCode = 0; // counter of the reservation
     public ReentrantLock lCounter = new ReentrantLock();
 
@@ -59,6 +61,9 @@ public class Map {
         }
     }
 
+    public int getD() {
+        return D;
+    }
 
     public Location[][] getMap()
     {
@@ -81,22 +86,21 @@ public class Map {
      * Make a reservation
      * @param user
      * @param location
-     * @return -1 if the user already has one reservation
-     * @return 0 if the reservation is done successfully
-     * @return 1 if there are no scooters free in the specific location
+     * @return location if the reservation is done successfully
+     * @return null if there are no scooters free in the near location
      */
-    public int makeReservation(User user, Location location)
+    public Location makeReservation(User user, Location location)
     {
         try {
             user.l.lock();
             // verify if the user does not have reservations and if there are free scooters in that location
-
-            if (location.getFreeScooters() > 0) {
+            Location aux = closestScooter(location);
+            if (aux != null) {
                 //decreases the number of free scooters in the location
-                location.removeScotter();
+                aux.removeScotter();
 
                 //associate revervation to user
-                user.setReserv(new Reservation(this.reservationCode, location, LocalDateTime.now()));
+                user.setReserv(new Reservation(this.reservationCode, aux, LocalDateTime.now()));
 
                 //increases the number of global reservations done
                 lCounter.lock();
@@ -112,9 +116,9 @@ public class Map {
                 notifL.unlock();
                 rewardsL.unlock();
 
-                return 1;
+                return aux;
             }
-            else return 0;
+            else return null;
 
 
         } finally {
@@ -178,6 +182,21 @@ public class Map {
         }
 
         return withFreeScooters;
+    }
+
+    public Location closestScooter(Location location){
+        LocationList locations = locationsFreeScooters(this.D, location);
+        double m = Double.POSITIVE_INFINITY;
+        Location r = null;
+        double aux;
+        for(Location l: locations){
+            aux = l.distance(location);
+            if(m > aux) {
+                r = l;
+                m = aux;
+            }
+        }
+        return r;
     }
 
     public String showAllRewards()
