@@ -20,7 +20,7 @@ class ServerWorker implements Runnable
     HashMap<String,User> users;
     private Socket socket;
 
-    private ReentrantReadWriteLock l;
+    ReentrantReadWriteLock l;
 
     public ServerWorker (Socket socket, Map a, HashMap<String,User> u, ReentrantReadWriteLock l) {
         this.socket = socket;
