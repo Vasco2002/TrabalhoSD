@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class Notifications implements Runnable {
 
@@ -14,12 +15,16 @@ public class Notifications implements Runnable {
 
     private static Map map;
 
-    public Notifications(Map m,  HashMap<String,User> u){
+    private ReentrantReadWriteLock l;
+
+    public Notifications(Map m, HashMap<String,User> u, ReentrantReadWriteLock l){
         this.map = m;
         this.users = u;
+        this.l = l;
     }
 
     public void sendNotifications() throws IOException {
+        l.readLock().lock();
         for(User u: this.users.values())
         {
             Location pos = u.getPos();
@@ -29,6 +34,7 @@ public class Notifications implements Runnable {
                 u.getTaggedConnection().send(9,l);
             }
         }
+        l.readLock().unlock();
     }
 
 

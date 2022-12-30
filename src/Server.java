@@ -19,13 +19,14 @@ class ServerWorker implements Runnable
     Map map;
     HashMap<String,User> users;
     private Socket socket;
-    public ReentrantReadWriteLock l = new ReentrantReadWriteLock();
 
+    private ReentrantReadWriteLock l;
 
-    public ServerWorker (Socket socket, Map a, HashMap<String,User> u) {
+    public ServerWorker (Socket socket, Map a, HashMap<String,User> u, ReentrantReadWriteLock l) {
         this.socket = socket;
         this.map = a;
         this.users = u;
+        this.l = l;
     }
 
     @Override
@@ -165,6 +166,7 @@ public class Server {
     private static HashMap<String,User> users = new HashMap<>();
 
     private static Map map;
+    public static ReentrantReadWriteLock l = new ReentrantReadWriteLock();
     
     public static void main(String[] args) throws Exception 
     {
@@ -177,13 +179,13 @@ public class Server {
         Thread rewards = new Thread(new Rewards(map));
         rewards.start();
 
-        Thread notification = new Thread(new Notifications(map,users));
+        Thread notification = new Thread(new Notifications(map,users,l));
         notification.start();
 
         while(true)
         {
             Socket socket = serverSocket.accept();
-            Thread worker = new Thread(new ServerWorker(socket, map, users));
+            Thread worker = new Thread(new ServerWorker(socket, map, users, l));
             worker.start();
         }
     }
