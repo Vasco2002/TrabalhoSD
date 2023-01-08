@@ -150,9 +150,7 @@ class ServerWorker implements Runnable {
  */
 public class Server {
 
-    // args[0] = server tcp port
-    // args[1] = mapa
-    // args[2] = users
+    // args[0] = tamanho do mapa
 
     private static HashMap<String, User> users = new HashMap<>();
 
@@ -161,25 +159,21 @@ public class Server {
 
     public static void main(String[] args) {
         try {
-            ServerSocket serverSocket = new ServerSocket(Integer.parseInt(args[0]));
-            /*
-             * Every time a new Client tries to connect, accept that connection, run a
-             * worker to handle the client and go back to waiting for new clients.
-             */
+            try (ServerSocket serverSocket = new ServerSocket(5555)) {
+                // create map
+                map = new Map(Integer.parseInt(args[0]));
 
-            // create map
-            map = new Map(Integer.parseInt(args[1]));
+                Thread rewards = new Thread(new Rewards(map));
+                rewards.start();
 
-            Thread rewards = new Thread(new Rewards(map));
-            rewards.start();
+                Thread notification = new Thread(new Notifications(map, users, l));
+                notification.start();
 
-            Thread notification = new Thread(new Notifications(map, users, l));
-            notification.start();
-
-            while (true) {
-                Socket socket = serverSocket.accept();
-                Thread worker = new Thread(new ServerWorker(socket, map, users, l));
-                worker.start();
+                while (true) {
+                    Socket socket = serverSocket.accept();
+                    Thread worker = new Thread(new ServerWorker(socket, map, users, l));
+                    worker.start();
+                }
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
