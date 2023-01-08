@@ -55,4 +55,13 @@ public class Reward {
 
         return new Reward(a,b,reward);
     }
+
+    public String toString(){
+        StringBuilder sb = new StringBuilder();
+        sb.append("(").append(this.b.x).append(",").append(this.b.y).append(")")
+                .append("-(").append(this.a.x).append(",").append(this.a.y).append(")")
+                .append(": ").append(this.reward).append(" €");
+
+        return sb.toString();
+    }
 }

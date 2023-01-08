@@ -27,20 +27,35 @@ public class Demultiplexer {
     }
 
     public void start() {
-        System.out.println("here");
         new Thread(() -> {
             try {
                 while (true) {
-                    System.out.println("here");
-                    Frame frame = tc.receive();
+                    Frame frame = tc.receiveClient();
                     l.lock();
                     try {
-                        FrameValue fv = map.get(frame.tag);
+                        int tag = frame.tag;
+                        FrameValue fv = map.get(tag);
                         if (fv == null) {
                             fv = new FrameValue();
                             map.put(frame.tag, fv);
                         }
-                        fv.queue.add(frame.data);
+                        if(tag == 4 || tag == 5 || tag == 9){
+                            fv.queue.add(frame.rewardList.toString().getBytes());
+                        }
+                        else if(tag == 3){
+                            fv.queue.add(String.valueOf(frame.reserv).getBytes());
+                        }
+                        else if(tag == 2){
+                            String aux;
+                            if(frame.r == -1) aux = "There are no scooters near this location!";
+                            else aux = "Reservation " + frame.r + " done in (" + frame.x + "," + frame.y + ") :)";
+                            fv.queue.add(aux.getBytes());
+                        }
+                        else if(tag == 1){
+                            fv.queue.add(frame.locationList.toString().getBytes());
+                        }
+                        else
+                            fv.queue.add(frame.data);
                         fv.c.signal();
                         // if one thread gets exception, wake up all
                         if (exception != null) 
@@ -60,13 +75,12 @@ public class Demultiplexer {
     }
 
     public void send(Frame frame) throws IOException {
-        tc.send(frame);
+        tc.sendClient(frame);
     }
 
     public void send(int tag, String username, int x, int y, int r, byte[] data) throws IOException {
-        tc.send(tag, username, x, y, r, data);
+        tc.sendClient(tag, username, x, y, r, data);
     }
-
 
     public byte[] receive(int tag) throws IOException, InterruptedException {
         l.lock();

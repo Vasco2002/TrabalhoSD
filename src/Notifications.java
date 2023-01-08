@@ -13,14 +13,14 @@ public class Notifications implements Runnable {
     private ReentrantReadWriteLock l;
 
     public Notifications(Map m, HashMap<String,User> u, ReentrantReadWriteLock l){
-        this.map = m;
-        this.users = u;
+        map = m;
+        users = u;
         this.l = l;
     }
 
     public void sendNotifications() throws IOException {
         l.readLock().lock();
-        for(User u: this.users.values())
+        for(User u: users.values())
         {
             Location pos = u.getPos();
             if(u.getWantNotification())
@@ -38,14 +38,14 @@ public class Notifications implements Runnable {
         while(true)
         {
             try {
-                this.map.notifL.lock();
+                map.notifL.lock();
 
                 while (!map.isaReward())
-                    this.map.cNot.await();
+                    map.cNot.await();
                this.sendNotifications();
 
                 map.aReward = false;
-                this.map.notifL.unlock();
+                map.notifL.unlock();
             }
             catch (IOException e) {
                 throw new RuntimeException(e);

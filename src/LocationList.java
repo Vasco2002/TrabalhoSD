@@ -24,4 +24,15 @@ public class LocationList extends ArrayList<Location> {
 
         return list;
     }
+
+    public String toString(){
+        if(this.size() == 0) {
+            return "There are no scooters available near the location provided!";
+        }
+        StringBuilder sb = new StringBuilder();
+        for(Location l : this){
+            sb.append(l.toString()).append("\n");
+        }
+        return sb.toString();
+    }
 }
