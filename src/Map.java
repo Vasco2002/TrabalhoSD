@@ -92,7 +92,7 @@ public class Map {
     public Location makeReservation(User user, Location location)
     {
         try {
-            user.l.lock();
+            user.l.writeLock().lock();
             // verify if the user does not have reservations and if there are free scooters in that location
             Location aux = closestScooter(location);
             if (aux != null) {
@@ -122,7 +122,7 @@ public class Map {
 
 
         } finally {
-            user.l.unlock();
+            user.l.writeLock().unlock();
         }
     }
 
@@ -131,7 +131,7 @@ public class Map {
     public double parkScooter(User user, Location location)
     {
         double price = 0;
-        user.l.lock();
+        user.l.writeLock().lock();
 
         // retira da localização anterior e adiciona na presente
         // decrease number of free scooters in
@@ -162,7 +162,7 @@ public class Map {
         notifL.unlock();
         rewardsL.unlock();
 
-        user.l.unlock();
+        user.l.writeLock().unlock();
         return price;
     }
 
