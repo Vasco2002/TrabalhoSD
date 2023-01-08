@@ -5,19 +5,18 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 import java.text.DecimalFormat;
 
-
 /**
  * Client-side implementation of the program.
  *
- * Instance of <code>Server</code> must be running before running instance of <code>Client</code>.
+ * Instance of <code>Server</code> must be running before running instance of
+ * <code>Client</code>.
  * Multiple instances of this class can run at the same time.
  */
 public class Client {
 
-    public static void main(String[] args)
-    {
-        try{
-            Socket s = new Socket("localhost",5555);
+    public static void main(String[] args) {
+        try {
+            Socket s = new Socket("localhost", 5555);
             Demultiplexer m = new Demultiplexer(new TaggedConnection(s));
             m.start();
 
@@ -32,28 +31,27 @@ public class Client {
 
             while (username == null) {
                 System.out.print("**** Welcome to scooters app! ****\n"
-                               + "\n"
-                               + "Do you have an account?\n"
-                               + "1) Yes.\n"
-                               + "2) No.\n"
-                               + "\n"
-                               + "Enter the correspondent value: ");
+                        + "\n"
+                        + "Do you have an account?\n"
+                        + "1) Yes.\n"
+                        + "2) No.\n"
+                        + "\n"
+                        + "Enter the correspondent value: ");
                 String option = stdin.readLine();
-                if(option.equals("1")) {
+                if (option.equals("1")) {
                     System.out.print("***LOG IN***\n"
-                                    + "\n"
-                                    + "Email: ");
+                            + "\n"
+                            + "Email: ");
                     String email = stdin.readLine();
                     System.out.print("Password: ");
                     String password = stdin.readLine();
                     m.send(6, email, 0, 0, 0, password.getBytes());
                     String response = new String(m.receive(6));
-                    if(!response.startsWith("Error")) {
+                    if (!response.startsWith("Error")) {
                         username = email;
                     }
                     System.out.println("\n" + response + "\n");
-                }
-                else if (option.equals("2")) {
+                } else if (option.equals("2")) {
                     System.out.print("***CREATE ACCOUNT***\n"
                             + "\n"
                             + "Email: ");
@@ -62,7 +60,7 @@ public class Client {
                     String password = stdin.readLine();
                     m.send(7, email, 0, 0, 0, password.getBytes());
                     String response = new String(m.receive(7));
-                    if(!response.startsWith("Error")) {
+                    if (!response.startsWith("Error")) {
                         username = email;
                     }
                     System.out.println("\n" + response + "\n");
@@ -89,7 +87,7 @@ public class Client {
                 System.out.println("\nOption: " + option + "\n");
                 int x, y, r;
                 String response;
-                switch(option) {
+                switch (option) {
                     case "0":
                         m.send(0, "", 0, 0, 0, "".getBytes());
                         m.receive(0);
@@ -97,75 +95,92 @@ public class Client {
                         exit = true;
                         break;
                     case "1":
-                        System.out.println("Enter your current location:\n"
-                                + "x: ");
-                        x = Integer.parseInt(stdin.readLine());
-                        System.out.println("y: ");
-                        y = Integer.parseInt(stdin.readLine());
-                        System.out.println("Radius:");
-                        r = Integer.parseInt(stdin.readLine());
-                        m.send(1, username, x, y, r, "".getBytes());
-                        response = new String(m.receive(1));
-                        System.out.println("\n" + response + "\n");
+                        try {
+                            System.out.println("Enter your current location:\n"
+                                    + "x: ");
+
+                            x = Integer.parseInt(stdin.readLine());
+                            System.out.println("y: ");
+                            y = Integer.parseInt(stdin.readLine());
+                            System.out.println("Radius:");
+                            r = Integer.parseInt(stdin.readLine());
+                            m.send(1, username, x, y, r, "".getBytes());
+                            response = new String(m.receive(1));
+                            System.out.println("\n" + response + "\n");
+                        } catch (Exception e) {
+                            System.out.println("\n :( That's not a number...");
+                        }
                         break;
                     case "2":
                         if (hasReserv >= 0)
                             System.out.println("You already have a reservation!");
                         else {
-                            System.out.println("Enter your current location:\n"
-                                    + "x: ");
-                            x = Integer.parseInt(stdin.readLine());
-                            System.out.println("y: ");
-                            y = Integer.parseInt(stdin.readLine());
-                            m.send(2, username, x, y, 0, "".getBytes());
-                            response = new String(m.receive(2));
-                            if(!response.equals("There are no scooters near this location!")){
-                                String[] out = response.split(" ");
-                                hasReserv = Integer.parseInt(out[1]);
+                            try {
+                                System.out.println("Enter your current location:\n"
+                                        + "x: ");
+                                x = Integer.parseInt(stdin.readLine());
+                                System.out.println("y: ");
+                                y = Integer.parseInt(stdin.readLine());
+                                m.send(2, username, x, y, 0, "".getBytes());
+                                response = new String(m.receive(2));
+                                if (!response.equals("There are no scooters near this location!")) {
+                                    String[] out = response.split(" ");
+                                    hasReserv = Integer.parseInt(out[1]);
+                                }
+                                System.out.println("\n" + response + "\n");
+                            } catch (Exception e) {
+                                System.out.println("\n :( That's not a number...");
                             }
-                            System.out.println("\n" + response + "\n");
                         }
                         break;
                     case "3":
                         if (hasReserv == -1)
                             System.out.println("You don't have a reservation!");
-                        else{
+                        else {
                             System.out.println("Enter you Reservation code:");
                             r = Integer.parseInt(stdin.readLine());
-                            if(r == hasReserv) {
-                                System.out.println("Enter the location which you want to park the scooter:\n"
-                                        + "x: ");
-                                x = Integer.parseInt(stdin.readLine());
-                                System.out.println("y: ");
-                                y = Integer.parseInt(stdin.readLine());
-                                m.send(3, username, x, y, r, "".getBytes());
-                                response = new String(m.receive(3));
-                                Double responseD = Double.parseDouble(response);
-                                DecimalFormat df = new DecimalFormat("0.00");
-                                if (responseD < 0) {
-                                    System.out.println("Here's the cost of the trip: " + df.format(Math.abs(responseD)) + "€");
+                            if (r == hasReserv) {
+                                try {
+                                    System.out.println("Enter the location which you want to park the scooter:\n"
+                                            + "x: ");
+                                    x = Integer.parseInt(stdin.readLine());
+                                    System.out.println("y: ");
+                                    y = Integer.parseInt(stdin.readLine());
+                                    m.send(3, username, x, y, r, "".getBytes());
+                                    response = new String(m.receive(3));
+                                    Double responseD = Double.parseDouble(response);
+                                    DecimalFormat df = new DecimalFormat("0.00");
+                                    if (responseD < 0) {
+                                        System.out.println(
+                                                "Here's the cost of the trip: " + df.format(Math.abs(responseD)) + "€");
 
-
-                                } else {
-                                    System.out.println("Here's your reward: " + df.format(responseD) + "€");
+                                    } else {
+                                        System.out.println("Here's your reward: " + df.format(responseD) + "€");
+                                    }
+                                    hasReserv = -1;
+                                } catch (Exception e) {
+                                    System.out.println("\n :( That's not a number...");
                                 }
-                                hasReserv = -1;
                             } else {
                                 System.out.println("That's not your reservation code >:(");
                             }
                         }
                         break;
                     case "4":
-                        System.out.println("Enter your current location:\n"
-                                + "x: ");
-                        x = Integer.parseInt(stdin.readLine());
-                        System.out.println("y: ");
-                        y = Integer.parseInt(stdin.readLine());
-                        System.out.println("Radius:");
-                        r = Integer.parseInt(stdin.readLine());
-                        m.send(4, username, x, y, r, "".getBytes());
-                        response = new String(m.receive(4));
-                        System.out.println("\n" + response + "\n");
+                        try {
+                            System.out.println("Enter your current location:\n"
+                                    + "x: ");
+                            x = Integer.parseInt(stdin.readLine());
+                            System.out.println("y: ");
+                            y = Integer.parseInt(stdin.readLine());
+                            System.out.println("Radius:");
+                            r = Integer.parseInt(stdin.readLine());
+                            m.send(4, username, x, y, r, "".getBytes());
+                            response = new String(m.receive(4));
+                            System.out.println("\n" + response + "\n");
+                        } catch (Exception e) {
+                            System.out.println("\n :( That's not a number...");
+                        }
                         break;
                     case "5":
                         m.send(5, username, 0, 0, 0, "".getBytes());
@@ -173,22 +188,24 @@ public class Client {
                         System.out.println("\n" + response + "\n");
                         break;
                     case "6":
-                        if (wantNotific)
-                        {
+                        if (wantNotific) {
                             // quer desativar notificação
                             wantNotific = false;
                             m.send(8, username, 0, 0, 0, "".getBytes());
                             System.out.println("Desativou notificações! D:");
-                        }
-                        else {
-                            System.out.println("Enter your current location:\n"
-                                    + "x: ");
-                            x = Integer.parseInt(stdin.readLine());
-                            System.out.println("y: ");
-                            y = Integer.parseInt(stdin.readLine());
-                            m.send(8, username, x, y, 0, "".getBytes());
-                            wantNotific = true;
-                            System.out.println("Ativou notificações! ^-^");
+                        } else {
+                            try {
+                                System.out.println("Enter your current location:\n"
+                                        + "x: ");
+                                x = Integer.parseInt(stdin.readLine());
+                                System.out.println("y: ");
+                                y = Integer.parseInt(stdin.readLine());
+                                m.send(8, username, x, y, 0, "".getBytes());
+                                wantNotific = true;
+                                System.out.println("Ativou notificações! ^-^");
+                            } catch (Exception e) {
+                                System.out.println("\n :( That's not a number...");
+                            }
                         }
                         break;
                 }
@@ -196,9 +213,7 @@ public class Client {
             m.close();
             s.close();
             System.exit(0);
-        }
-        catch(Exception e)
-        {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }

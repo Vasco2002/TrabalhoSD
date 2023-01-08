@@ -8,9 +8,9 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * Container for a message, with extra information.
  *
- * Using a frame, we can send messages that contain information about the type of message it is and the user who sent the message.
+ * Using a frame, we can send messages that contain information about the type
+ * of message it is and the user who sent the message.
  */
-
 
 public class TaggedConnection implements AutoCloseable {
     private final DataInputStream dis;
@@ -28,16 +28,13 @@ public class TaggedConnection implements AutoCloseable {
             wl.lock();
             int tag = frame.tag;
             this.dos.writeInt(tag);
-            if(tag == 4 || tag == 5 || tag == 9){
+            if (tag == 4 || tag == 5 || tag == 9) {
                 frame.rewardList.serialize(dos);
-            }
-            else if(tag == 3){
+            } else if (tag == 3) {
                 this.dos.writeDouble(frame.reserv);
-            }
-            else if(tag == 1){
+            } else if (tag == 1) {
                 frame.locationList.serialize(dos);
-            }
-            else {
+            } else {
                 this.dos.writeUTF(frame.username);
                 this.dos.writeInt(frame.x);
                 this.dos.writeInt(frame.y);
@@ -47,14 +44,13 @@ public class TaggedConnection implements AutoCloseable {
             }
 
             this.dos.flush();
-        }
-        finally {
+        } finally {
             wl.unlock();
         }
     }
 
-    public void send(int tag, String username,int x, int y, int r, byte[] data) throws IOException {
-        this.send(new Frame(tag, username, x, y , r, data));
+    public void send(int tag, String username, int x, int y, int r, byte[] data) throws IOException {
+        this.send(new Frame(tag, username, x, y, r, data));
     }
 
     public void send(int tag, RewardList rewardList) throws IOException {
@@ -69,26 +65,30 @@ public class TaggedConnection implements AutoCloseable {
         this.send(new Frame(tag, reserv));
     }
 
-    public Frame receive() throws IOException {
+    public Frame receive() {
         int tag;
         String username;
         int x, y, r;
         byte[] data;
         try {
-            rl.lock();
-            tag = this.dis.readInt();
-            username = this.dis.readUTF();
-            x = this.dis.readInt();
-            y = this.dis.readInt();
-            r = this.dis.readInt();
-            int n = this.dis.readInt();
-            data = new byte[n];
-            this.dis.readFully(data);
+            try {
+                rl.lock();
+                tag = this.dis.readInt();
+                username = this.dis.readUTF();
+                x = this.dis.readInt();
+                y = this.dis.readInt();
+                r = this.dis.readInt();
+                int n = this.dis.readInt();
+                data = new byte[n];
+                this.dis.readFully(data);
+            } finally {
+                rl.unlock();
+            }
+            return new Frame(tag, username, x, y, r, data);
+        } catch (IOException e) {
+            // do something my friend
+            return null;
         }
-        finally {
-            rl.unlock();
-        }
-        return new Frame(tag, username, x, y , r, data);
     }
 
     public void sendClient(Frame frame) throws IOException {
@@ -102,17 +102,14 @@ public class TaggedConnection implements AutoCloseable {
             this.dos.writeInt(frame.data.length);
             this.dos.write(frame.data);
             this.dos.flush();
-        }
-        finally {
+        } finally {
             wl.unlock();
         }
     }
 
-    public void sendClient(int tag, String username,int x, int y, int r, byte[] data) throws IOException {
-        this.sendClient(new Frame(tag, username, x, y , r, data));
+    public void sendClient(int tag, String username, int x, int y, int r, byte[] data) throws IOException {
+        this.sendClient(new Frame(tag, username, x, y, r, data));
     }
-
-
 
     public Frame receiveClient() throws IOException {
 
@@ -123,19 +120,16 @@ public class TaggedConnection implements AutoCloseable {
         try {
             rl.lock();
             tag = this.dis.readInt();
-            if(tag == 4 || tag == 5 || tag == 9){
+            if (tag == 4 || tag == 5 || tag == 9) {
                 RewardList rewardList = RewardList.deserialize(dis);
                 return new Frame(tag, rewardList);
-            }
-            else if(tag == 3){
+            } else if (tag == 3) {
                 double reserv = this.dis.readDouble();
                 return new Frame(tag, reserv);
-            }
-            else if(tag == 1){
+            } else if (tag == 1) {
                 LocationList locationList = LocationList.deserialize(dis);
                 return new Frame(tag, locationList);
-            }
-            else {
+            } else {
                 username = this.dis.readUTF();
                 x = this.dis.readInt();
                 y = this.dis.readInt();
@@ -143,11 +137,10 @@ public class TaggedConnection implements AutoCloseable {
                 int n = this.dis.readInt();
                 data = new byte[n];
                 this.dis.readFully(data);
-                return new Frame(tag, username, x, y , r, data);
+                return new Frame(tag, username, x, y, r, data);
             }
 
-        }
-        finally {
+        } finally {
             rl.unlock();
         }
 
