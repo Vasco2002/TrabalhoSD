@@ -3,16 +3,8 @@ package src;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 class ServerWorker implements Runnable 
 {
@@ -102,7 +94,6 @@ class ServerWorker implements Runnable
                         break;
                     case 3:
                         // Parking
-                        int reserv = frame.r;
                         pos = map.getMap()[frame.x][frame.y];
                         this.users.get(email).setPos(pos);
                         c.send(3, map.parkScooter(users.get(frame.username), pos));
@@ -174,7 +165,7 @@ public class Server {
         /* Every time a new Client tries to connect, accept that connection, run a worker to handle the client and go back to waiting for new clients. */
 
         // create map
-        Map map = new Map(Integer.parseInt(args[1]));
+        map = new Map(Integer.parseInt(args[1]));
 
         Thread rewards = new Thread(new Rewards(map));
         rewards.start();
