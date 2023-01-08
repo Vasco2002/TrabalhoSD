@@ -58,6 +58,9 @@ public class Teste {
             System.out.println("\nTestar ativar/desativar notificações ");
             make_operations(m, TN, OP, 6, V, s);
 
+            System.out.println("\nTestar operacionalidades aleatoriamente ");
+            make_operationsRandom(m, TN, OP, V, s);
+
             // Show total execution time
             System.out.println("\n[CLOCK] Total time: " + (System.nanoTime() - startTime) / 1000000 + " ms");
 
