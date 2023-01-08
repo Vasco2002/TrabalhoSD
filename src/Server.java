@@ -159,25 +159,31 @@ public class Server {
     private static Map map;
     public static ReentrantReadWriteLock l = new ReentrantReadWriteLock();
     
-    public static void main(String[] args) throws Exception 
+    public static void main(String[] args)
     {
-        ServerSocket serverSocket = new ServerSocket(Integer.parseInt(args[0]));
-        /* Every time a new Client tries to connect, accept that connection, run a worker to handle the client and go back to waiting for new clients. */
+        try{
+            ServerSocket serverSocket = new ServerSocket(Integer.parseInt(args[0]));
+            /* Every time a new Client tries to connect, accept that connection, run a worker to handle the client and go back to waiting for new clients. */
 
-        // create map
-        map = new Map(Integer.parseInt(args[1]));
+            // create map
+            map = new Map(Integer.parseInt(args[1]));
 
-        Thread rewards = new Thread(new Rewards(map));
-        rewards.start();
+            Thread rewards = new Thread(new Rewards(map));
+            rewards.start();
 
-        Thread notification = new Thread(new Notifications(map,users,l));
-        notification.start();
+            Thread notification = new Thread(new Notifications(map,users,l));
+            notification.start();
 
-        while(true)
+            while(true)
+            {
+                Socket socket = serverSocket.accept();
+                Thread worker = new Thread(new ServerWorker(socket, map, users, l));
+                worker.start();
+            }
+        }
+        catch(Exception e)
         {
-            Socket socket = serverSocket.accept();
-            Thread worker = new Thread(new ServerWorker(socket, map, users, l));
-            worker.start();
+            throw new RuntimeException(e);
         }
     }
 

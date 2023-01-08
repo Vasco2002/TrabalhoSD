@@ -22,7 +22,7 @@ public class Demultiplexer {
         }
     }
 
-    public Demultiplexer(TaggedConnection conn) throws IOException {
+    public Demultiplexer(TaggedConnection conn) {
         this.tc = conn;
     }
 
