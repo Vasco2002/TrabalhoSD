@@ -2,6 +2,7 @@ package src;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.util.HashMap;
 import java.util.Random;
 
 public class Teste {
@@ -52,8 +53,8 @@ public class Teste {
             System.out.println("\nTestar Search close rewards ");
             make_operations(m, TN, OP, 4, V, s);
 
-            // System.out.println("\nTestar show all rewards ");
-            // make_operations(m, TN, OP, 5, V, s);
+            System.out.println("\nTestar show all rewards ");
+            make_operations(m, TN, OP, 5, V, s);
 
             System.out.println("\nTestar ativar/desativar notificações ");
             make_operations(m, TN, OP, 6, V, s);
@@ -64,11 +65,16 @@ public class Teste {
             // Show total execution time
             System.out.println("\n[CLOCK] Total time: " + (System.nanoTime() - startTime) / 1000000 + " ms");
 
-            // matar threads
-            make_operations(m, TN, OP, 0, V, s);
+            m.send(0, "", 0, 0, 0, "".getBytes());
+            m.receive(0);
+
+            s.shutdownInput();
+            m.close();
+            s.close();
+            System.exit(0);
 
         } catch (Exception e) {
-            // algo
+            System.out.println("Ocorreu erro");
         }
 
     }

@@ -7,7 +7,7 @@ import java.util.concurrent.locks.ReentrantLock;
 class Action implements Runnable {
     Demultiplexer b; // Demultiplexer
     int am; // Amount of operations
-    int mode; // -1 for random operations
+    int mode;
     boolean v; // Verbose
     Socket s;
     String user;
@@ -39,19 +39,11 @@ class Action implements Runnable {
         ReentrantLock l = new ReentrantLock();
         try {
 
-            // Make 'am' number of random operations in random accounts
             for (int m = 0; m < am; m++) {
-                if (mode == -1)
-                    op = rand.nextInt(3); // Random Operation
 
                 // Operation Switch
                 switch (op) {
 
-                    case 0:
-                        b.send(0, "", 0, 0, 0, "".getBytes());
-                        b.receive(0);
-                        s.shutdownInput();
-                        break;
                     case 1:
                         b.send(1, user, rand.nextInt(20), rand.nextInt(20), 2, "".getBytes());
                         response = new String(b.receive(1));
@@ -136,8 +128,11 @@ class Action implements Runnable {
 
                 }
             }
+
         } catch (Exception e) {
             // do something
+            System.out.println("Ocorreu Erro.");
+            System.exit(0);
         }
     }
 }
